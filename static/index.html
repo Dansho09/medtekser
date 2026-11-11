@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedTekser — корпоративные медосмотры сотрудников в одну заявку | Шымкент</title>
+  <meta name="description" content="Организация периодических, предварительных и предсменных медицинских осмотров для компаний в Шымкенте. Лицензированные клиники, выездные бригады, онлайн-кабинет HR." />
+  <meta property="og:title" content="MedTekser — корпоративные медосмотры под ключ" />
+  <meta property="og:description" content="Медосмотры сотрудников в одну заявку: подбор клиники, график, выездная бригада и онлайн-контроль статусов." />
+  <meta name="theme-color" content="#041d1a" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23088471'/%3E%3Cpath d='M8 17h4l2-5 4 9 2-4h4' stroke='white' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <!-- ============ HEADER ============ -->
+  <header class="site-header" id="header">
+    <div class="container">
+      <a href="/" class="logo" data-logo></a>
+      <nav class="nav" id="nav">
+        <a href="#benefits" data-ru="Преимущества" data-kk="Артықшылықтар">Преимущества</a>
+        <a href="#pricing" data-ru="Тарифы" data-kk="Тарифтер">Тарифы</a>
+        <a href="#how" data-ru="Как это работает" data-kk="Қалай жұмыс істейді">Как это работает</a>
+        <a href="#faq" data-ru="Вопросы" data-kk="Сұрақтар">Вопросы</a>
+      </nav>
+      <div class="header-cta">
+        <a class="header-phone" id="header-phone" href="tel:+77787961219" data-icon="phone" data-size="15">+7 (778) 796-12-19</a>
+        <div data-lang-switch></div>
+        <a href="/cabinet" class="btn ghost sm" data-ru="Кабинет HR" data-kk="HR кабинеті">Кабинет HR</a>
+        <a href="#order" class="btn sm" data-ru="Оставить заявку" data-kk="Өтінім қалдыру">Оставить заявку</a>
+      </div>
+      <button class="burger" id="burger" aria-label="Меню" data-icon="menu" data-size="26"></button>
+    </div>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="container">
+      <div>
+        <span class="eyebrow">
+          <span class="dot"></span>
+          <span data-ru="B2B MedTech сервис · Шымкент и Туркестанская область" data-kk="B2B MedTech сервис · Шымкент және Түркістан облысы">B2B MedTech сервис · Шымкент и Туркестанская область</span>
+        </span>
+        <h1 data-i18n-html
+            data-ru="Медосмотры сотрудников <span class='hl'>в одно окно</span> без очередей и бумажной волокиты"
+            data-kk="Қызметкерлердің медтексеруі кезексіз және қағазбастылықсыз <span class='hl'>бір терезеден</span>">
+          Медосмотры сотрудников <span class="hl">в одно окно</span> без очередей и бумажной волокиты
+        </h1>
+        <p class="lead"
+           data-ru="Берём на себя подбор лицензированной клиники или выездной бригады, расписание и сводный акт. HR и руководство видят статус каждого сотрудника онлайн в реальном времени."
+           data-kk="Лицензиясы бар клиниканы немесе көшпелі бригаданы таңдауды, кесте құруды және қорытынды актіні өз мойнымызға аламыз. HR мен басшылық әр қызметкердің мәртебесін нақты уақытта онлайн көреді.">
+          Берём на себя подбор лицензированной клиники или выездной бригады, расписание и сводный акт. HR и руководство видят статус каждого сотрудника онлайн в реальном времени.
+        </p>
+        <div class="actions">
+          <a href="#order" class="btn coral lg">
+            <span data-ru="Рассчитать стоимость" data-kk="Құнын есептеу">Рассчитать стоимость</span>
+            <span data-icon="arrowRight" data-size="18"></span>
+          </a>
+          <a id="hero-wa" class="btn light lg" target="_blank" rel="noopener">
+            <span data-ru="Написать в WhatsApp" data-kk="WhatsApp-қа жазу">Написать в WhatsApp</span>
+          </a>
+        </div>
+        <div class="hero-metrics">
+          <div>
+            <b>24 ч</b>
+            <span data-ru="запуск и договор" data-kk="іске қосу және шарт">запуск и договор</span>
+          </div>
+          <div>
+            <b>100%</b>
+            <span data-ru="по Приказу МЗ РК № 131" data-kk="ҚР ДСМ № 131 бұйрығына сай">по Приказу МЗ РК № 131</span>
+          </div>
+          <div>
+            <b>Онлайн</b>
+            <span data-ru="контроль каждого сотрудника" data-kk="әр қызметкерді бақылау">контроль каждого сотрудника</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Кабинет макеті (иллюстрация) -->
+      <div class="mock" aria-hidden="true">
+        <div class="float-card b">
+          <span class="ic" style="background:#f3efff;color:#7c3aed" data-icon="calendar"></span>
+          <div>
+            <span data-ru="20 ноября · 09:00" data-kk="20 қараша · 09:00">20 ноября · 09:00</span>
+            <small data-ru="Выездная медкомиссия на объект" data-kk="Көшпелі медкомиссия объектіге шығады">Выездная медкомиссия на объект</small>
+          </div>
+        </div>
+        <div class="mock-window">
+          <div class="mock-top">
+            <div class="mock-dots"><i></i><i></i><i></i></div>
+            <span class="mock-tag" data-ru="Кабинет работодателя · LIVE" data-kk="Жұмыс беруші кабинеті · LIVE">Кабинет работодателя · LIVE</span>
+          </div>
+          <h4>ТОО «Ontustik Qurylys Group»</h4>
+          <div class="meta" data-ru="Периодический медосмотр · 48 сотрудников" data-kk="Мерзімді медициналық тексеру · 48 қызметкер">Периодический медосмотр · 48 сотрудников</div>
+          <div class="ring-row">
+            <div class="ring" style="--p:75" data-label="75%"></div>
+            <div>
+              <b data-ru="36 из 48 прошли осмотр" data-kk="48-дің 36-сы тексеруден өтті">36 из 48 прошли осмотр</b>
+              <div class="muted small" data-ru="12 человек назначены на завтра" data-kk="12 адам ертеңгі кестеде">12 человек назначены на завтра</div>
+              <div class="progress" style="margin-top:8px;width:190px">
+                <div style="width:70%;background:#0d9f6e"></div>
+                <div style="width:5%;background:#e11d48"></div>
+                <div style="width:25%;background:#7c3aed"></div>
+              </div>
+            </div>
+          </div>
+          <div class="mock-row">
+            <span class="avatar" style="background:#0ea58e">НС</span>
+            <div class="grow"><b>Сейітов Нұрлан</b><div class="muted small" data-ru="Электросварщик · шум, аэрозоли" data-kk="Электрдәнекерлеуші · шу, аэрозоль">Электросварщик · шум, аэрозоли</div></div>
+            <span class="badge fit" data-ru="Годен" data-kk="Жарамды">Годен</span>
+          </div>
+          <div class="mock-row">
+            <span class="avatar" style="background:#ff6b4a">АӘ</span>
+            <div class="grow"><b>Әлиева Айгүл</b><div class="muted small" data-ru="Машинист башенного крана" data-kk="Мұнара кранының машинисі">Машинист башенного крана</div></div>
+            <span class="badge fit" data-ru="Годен" data-kk="Жарамды">Годен</span>
+          </div>
+          <div class="mock-row">
+            <span class="avatar" style="background:#7c3aed">БҚ</span>
+            <div class="grow"><b>Қасымов Бекзат</b><div class="muted small" data-ru="Монтажник высотник" data-kk="Биіктіктегі монтажшы">Монтажник высотник</div></div>
+            <span class="badge scheduled" data-ru="Назначен" data-kk="Жоспарланды">Назначен</span>
+          </div>
+        </div>
+        <div class="float-card a">
+          <span class="ic" style="background:#ecfdf5;color:#0d9f6e" data-icon="check"></span>
+          <div>
+            <span data-ru="Заключительный акт готов" data-kk="Қорытынды акт дайын">Заключительный акт готов</span>
+            <small data-ru="Выгрузка в Excel и печать" data-kk="Excel-ге жүктеу және басып шығару">Выгрузка в Excel и печать</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ МӘСЕЛЕ → ШЕШІМ ============ -->
+  <section class="section white">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="tag" data-ru="Проблема и решение" data-kk="Мәселе мен шешім">Проблема и решение</span>
+        <h2 data-ru="Освободите HR и инженера по ТБ от обзвона клиник и таблиц Excel"
+            data-kk="HR мен ЕҚ инженерін клиникаларға қоңырау шалу мен Excel кестелерінен босатыңыз">
+          Освободите HR и инженера по ТБ от обзвона клиник и таблиц Excel
+        </h2>
+        <p data-ru="Обычная организация медосмотра занимает недели согласований. Мы перевели весь процесс в единую цифровую платформу."
+           data-kk="Әдетте медициналық тексеруді ұйымдастыру апталап уақыт алады. Біз бүкіл процесті бірыңғай цифрлық платформаға көшірдік.">
+          Обычная организация медосмотра занимает недели согласований. Мы перевели весь процесс в единую цифровую платформу.
+        </p>
+      </div>
+      <div class="compare reveal">
+        <div class="card before">
+          <h3 data-ru="Как обычно происходит без MedTekser" data-kk="MedTekser-сіз әдетте қалай өтеді">Как обычно происходит без MedTekser</h3>
+          <ul>
+            <li><span class="x">✕</span><span data-ru="Ручной поиск клиник, запрос коммерческих предложений и проверка лицензий" data-kk="Клиникаларды қолмен іздеу, коммерциялық ұсыныс сұрату және лицензия тексеру">Ручной поиск клиник, запрос коммерческих предложений и проверка лицензий</span></li>
+            <li><span class="x">✕</span><span data-ru="Списки сотрудников пересылаются в мессенджерах и теряются" data-kk="Қызметкерлер тізімі мессенджерлерде жіберіліп, жоғалып кетеді">Списки сотрудников пересылаются в мессенджерах и теряются</span></li>
+            <li><span class="x">✕</span><span data-ru="Сотрудники стоят в очередях, смены срываются, непонятно кто прошёл" data-kk="Қызметкерлер кезекте тұрады, ауысым бұзылады, кім өткені белгісіз">Сотрудники стоят в очередях, смены срываются, непонятно кто прошёл</span></li>
+            <li><span class="x">✕</span><span data-ru="Риск штрафов от трудовой инспекции и СЭС за просроченные осмотры" data-kk="Мерзімі өткен тексерулер үшін еңбек инспекциясы мен СЭС айыппұлдары">Риск штрафов от трудовой инспекции и СЭС за просроченные осмотры</span></li>
+          </ul>
+        </div>
+        <div class="card after">
+          <h3 data-ru="Как работает с платформой MedTekser" data-kk="MedTekser платформасымен қалай жұмыс істейді">Как работает с платформой MedTekser</h3>
+          <ul>
+            <li><span class="v">✓</span><span data-ru="Фиксированная прозрачная стоимость и мгновенный расчёт на сайте" data-kk="Тұрақты ашық баға және сайтта бірден есептеу">Фиксированная прозрачная стоимость и мгновенный расчёт на сайте</span></li>
+            <li><span class="v">✓</span><span data-ru="Загрузка списка сотрудников за 10 секунд из Excel или CSV файла" data-kk="Қызметкерлер тізімін Excel немесе CSV файлдан 10 секундта жүктеу">Загрузка списка сотрудников за 10 секунд из Excel или CSV файла</span></li>
+            <li><span class="v">✓</span><span data-ru="Статус каждого работника («Годен», «Не годен», «Не явился») в онлайн-кабинете" data-kk="Әр қызметкердің мәртебесі («Жарамды», «Жарамсыз», «Келмеді») онлайн кабинетте">Статус каждого работника («Годен», «Не годен», «Не явился») в онлайн-кабинете</span></li>
+            <li><span class="v">✓</span><span data-ru="Официальный договор, счёт, ЭСФ и заключительный акт от лицензированной клиники" data-kk="Лицензияланған клиникадан ресми шарт, шот, ЭШФ және қорытынды акт">Официальный договор, счёт, ЭСФ и заключительный акт от лицензированной клиники</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ АРТЫҚШЫЛЫҚТАР ============ -->
+  <section class="section" id="benefits">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="tag" data-ru="Преимущества" data-kk="Артықшылықтар">Преимущества</span>
+        <h2 data-ru="Почему компании Шымкента выбирают MedTekser" data-kk="Неліктен Шымкент компаниялары MedTekser-ді таңдайды">Почему компании Шымкента выбирают MedTekser</h2>
+      </div>
+      <div class="grid g-4">
+        <div class="card hover reveal">
+          <div class="feature-ic" data-icon="clock" data-size="26"></div>
+          <h3 data-ru="Прохождение за 1–3 дня" data-kk="1–3 күнде өту">Прохождение за 1–3 дня</h3>
+          <p class="muted" data-ru="Выделенные временные окна для вашей компании без общих очередей в поликлинике." data-kk="Емханадағы жалпы кезексіз сіздің компанияңызға арнайы уақыт бөлінеді.">Выделенные временные окна для вашей компании без общих очередей в поликлинике.</p>
+        </div>
+        <div class="card hover reveal">
+          <div class="feature-ic coral" data-icon="shield" data-size="26"></div>
+          <h3 data-ru="Строго по закону РК" data-kk="ҚР заңына толық сай">Строго по закону РК</h3>
+          <p class="muted" data-ru="Осмотры проводят проверенные партнёрские медцентры с государственной лицензией." data-kk="Тексеруді мемлекеттік лицензиясы бар тексерілген серіктес медорталықтар жүргізеді.">Осмотры проводят проверенные партнёрские медцентры с государственной лицензией.</p>
+        </div>
+        <div class="card hover reveal">
+          <div class="feature-ic violet" data-icon="truck" data-size="26"></div>
+          <h3 data-ru="Выезд на предприятие" data-kk="Кәсіпорынға шығу">Выезд на предприятие</h3>
+          <p class="muted" data-ru="При штате от 30 человек мобильная бригада врачей приедет прямо на ваш завод, склад или стройплощадку." data-kk="30 адамнан асса, көшпелі дәрігерлер бригадасы зауытқа, қоймаға немесе құрылыс алаңына келеді.">При штате от 30 человек мобильная бригада врачей приедет прямо на ваш завод, склад или стройплощадку.</p>
+        </div>
+        <div class="card hover reveal">
+          <div class="feature-ic amber" data-icon="chart" data-size="26"></div>
+          <h3 data-ru="Личный кабинет HR" data-kk="HR жеке кабинеті">Личный кабинет HR</h3>
+          <p class="muted" data-ru="Полная прозрачность: кто прошёл, у кого противопоказания, кто не явился — и готовый отчёт на печать." data-kk="Толық ашықтық: кім өтті, кімге қарсы көрсетілім бар, кім келмеді — және басып шығаруға дайын есеп.">Полная прозрачность: кто прошёл, у кого противопоказания, кто не явился — и готовый отчёт на печать.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ БАҒАЛАР ============ -->
+  <section class="section white" id="pricing">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="tag" data-ru="Тарифы" data-kk="Тарифтер">Тарифы</span>
+        <h2 data-ru="Прозрачные тарифы без скрытых доплат" data-kk="Жасырын төлемсіз ашық тарифтер">Прозрачные тарифы без скрытых доплат</h2>
+        <p id="pricing-sub"></p>
+      </div>
+      <div class="grid g-4" id="pricing-grid"></div>
+    </div>
+  </section>
+
+  <!-- ============ ҚАЛАЙ ЖҰМЫС ІСТЕЙДІ ============ -->
+  <section class="section" id="how">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="tag" data-ru="Процесс работы" data-kk="Жұмыс процесі">Процесс работы</span>
+        <h2 data-ru="4 простых шага от заявки до закрывающих документов" data-kk="Өтінімнен бастап қорытынды құжаттарға дейін 4 қадам">4 простых шага от заявки до закрывающих документов</h2>
+      </div>
+      <div class="grid g-4 steps">
+        <div class="step reveal">
+          <div class="num">01</div>
+          <h3 data-ru="Онлайн-заявка" data-kk="Онлайн-өтінім">Онлайн-заявка</h3>
+          <p class="muted" data-ru="Оставляете заявку на сайте, сразу видите расчёт стоимости и получаете код доступа в кабинет." data-kk="Сайтта өтінім қалдырасыз, бағасын бірден көресіз және кабинетке кіру кодын аласыз.">Оставляете заявку на сайте, сразу видите расчёт стоимости и получаете код доступа в кабинет.</p>
+        </div>
+        <div class="step reveal">
+          <div class="num">02</div>
+          <h3 data-ru="Список сотрудников" data-kk="Қызметкерлер тізімі">Список сотрудников</h3>
+          <p class="muted" data-ru="Загружаете список работников (ФИО, ИИН, должность, вредный фактор) из Excel в личном кабинете." data-kk="Жеке кабинетте қызметкерлер тізімін (ТАӘ, ЖСН, лауазымы, зиянды фактор) Excel-ден жүктейсіз.">Загружаете список работников (ФИО, ИИН, должность, вредный фактор) из Excel в личном кабинете.</p>
+        </div>
+        <div class="step reveal">
+          <div class="num">03</div>
+          <h3 data-ru="График и осмотр" data-kk="Кесте және тексеру">График и осмотр</h3>
+          <p class="muted" data-ru="Закрепляем клинику или направляем выездную бригаду в согласованную дату без очередей." data-kk="Кезексіз келісілген күні клиниканы бекітеміз немесе көшпелі бригаданы жібереміз.">Закрепляем клинику или направляем выездную бригаду в согласованную дату без очередей.</p>
+        </div>
+        <div class="step reveal">
+          <div class="num">04</div>
+          <h3 data-ru="Заключения и акт" data-kk="Қорытынды және акт">Заключения и акт</h3>
+          <p class="muted" data-ru="Врачебные заключения появляются в кабинете, вы скачиваете реестр и получаете закрывающие документы." data-kk="Дәрігер қорытындылары кабинетте шығады, тізілімді жүктеп, жабу құжаттарын аласыз.">Врачебные заключения появляются в кабинете, вы скачиваете реестр и получаете закрывающие документы.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ӨТІНІМ ============ -->
+  <section class="section white" id="order">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="tag" data-ru="Калькулятор и заявка" data-kk="Калькулятор және өтінім">Калькулятор и заявка</span>
+        <h2 data-ru="Рассчитайте стоимость и оставьте заявку" data-kk="Құнын есептеп, өтінім қалдырыңыз">Рассчитайте стоимость и оставьте заявку</h2>
+        <p data-ru="Сразу после отправки вы получите доступ в личный кабинет, а менеджер свяжется для оформления договора." data-kk="Жібергеннен кейін бірден жеке кабинетке кіре аласыз, ал менеджер шарт рәсімдеу үшін хабарласады.">Сразу после отправки вы получите доступ в личный кабинет, а менеджер свяжется для оформления договора.</p>
+      </div>
+      <div class="order-wrap">
+        <div class="card" style="padding:32px">
+          <form id="order-form" novalidate>
+            <div class="field">
+              <span class="label" data-ru="Выберите тип медосмотра" data-kk="Медтексеру түрін таңдаңыз">Выберите тип медосмотра</span>
+              <div class="chips" id="exam-chips"></div>
+            </div>
+            <div class="form-grid">
+              <div class="field">
+                <label for="f-company" data-ru="Название компании *" data-kk="Компания атауы *">Название компании *</label>
+                <input id="f-company" name="company" data-ph-ru="ТОО «СтройИнвест»" data-ph-kk="ЖШС «ҚұрылысИнвест»" placeholder="ТОО «СтройИнвест»" required />
+              </div>
+              <div class="field">
+                <label for="f-bin" data-ru="БИН компании" data-kk="Компания БСН-і">БИН компании</label>
+                <input id="f-bin" name="bin" inputmode="numeric" maxlength="12" data-ph-ru="12 цифр (необязательно)" data-ph-kk="12 сан (міндетті емес)" placeholder="12 цифр (необязательно)" />
+              </div>
+              <div class="field">
+                <label for="f-name" data-ru="Контактное лицо *" data-kk="Байланыс тұлға *">Контактное лицо *</label>
+                <input id="f-name" name="contact_name" data-ph-ru="Имя и должность" data-ph-kk="Аты-жөні және лауазымы" placeholder="Имя и должность" required />
+              </div>
+              <div class="field">
+                <label for="f-phone" data-ru="Телефон / WhatsApp *" data-kk="Телефон / WhatsApp *">Телефон / WhatsApp *</label>
+                <input id="f-phone" name="phone" type="tel" placeholder="+7 (7__) ___-__-__" required />
+              </div>
+              <div class="field">
+                <label for="f-email">Email</label>
+                <input id="f-email" name="email" type="email" placeholder="hr@company.kz" />
+              </div>
+              <div class="field">
+                <label for="f-date" data-ru="Желаемая дата осмотра" data-kk="Қалаған тексеру күні">Желаемая дата осмотра</label>
+                <input id="f-date" name="preferred_date" type="date" />
+              </div>
+              <div class="field full">
+                <label for="f-count"><span data-ru="Количество сотрудников:" data-kk="Қызметкерлер саны:">Количество сотрудников:</span> <b id="count-label">25</b></label>
+                <input id="f-count" name="employees_count" type="number" min="1" max="10000" value="25" required />
+              </div>
+              <div class="field full">
+                <label for="f-comment" data-ru="Комментарий или особые условия" data-kk="Пікір немесе қосымша талаптар">Комментарий или особые условия</label>
+                <textarea id="f-comment" name="comment"
+                  data-ph-ru="Например: 10 сварщиков с вредными факторами, нужен выезд бригады на объект"
+                  data-ph-kk="Мысалы: 10 дәнекерлеушіде зиянды фактор бар, объектіге көшпелі бригада қажет"
+                  placeholder="Например: 10 сварщиков с вредными факторами, нужен выезд бригады на объект"></textarea>
+              </div>
+              <input class="hp" name="website" tabindex="-1" autocomplete="off" />
+            </div>
+            <div id="order-error"></div>
+            <button class="btn coral lg block" type="submit" id="submit-btn" data-ru="Отправить заявку и получить доступ в кабинет" data-kk="Өтінім жіберу және кабинетке код алу">Отправить заявку и получить доступ в кабинет</button>
+            <p class="muted small center" style="margin-top:12px" data-ru="Нажимая кнопку, вы соглашаетесь на обработку персональных данных согласно законодательству РК." data-kk="Түймені басу арқылы ҚР заңнамасына сәйкес дербес деректерді өңдеуге келісесіз.">Нажимая кнопку, вы соглашаетесь на обработку персональных данных согласно законодательству РК.</p>
+          </form>
+          <div id="order-success" class="hidden"></div>
+        </div>
+
+        <aside class="card summary">
+          <div class="small" style="opacity:.78;text-transform:uppercase;letter-spacing:.08em;font-weight:700" data-ru="Предварительный расчёт" data-kk="Алдын ала есеп">Предварительный расчёт</div>
+          <div class="total" id="sum-total">0 ₸</div>
+          <div class="small" style="opacity:.78;margin-bottom:18px" id="sum-per"></div>
+          <div class="line"><span data-ru="Тип осмотра" data-kk="Тексеру түрі">Тип осмотра</span><b id="sum-type"></b></div>
+          <div class="line"><span data-ru="Сотрудников" data-kk="Қызметкер саны">Сотрудников</span><b id="sum-count"></b></div>
+          <div class="line"><span data-ru="Базовая стоимость" data-kk="Негізгі құны">Базовая стоимость</span><b id="sum-sub"></b></div>
+          <div class="line"><span data-ru="Сервисное сопровождение (10%)" data-kk="Сервистік сүйемелдеу (10%)">Сервисное сопровождение (10%)</span><b id="sum-fee"></b></div>
+          <ul>
+            <li><i>✓</i> <span data-ru="Официальный договор, счёт и АВР / ЭСФ" data-kk="Ресми шарт, шот және ОЖА / ЭШФ">Официальный договор, счёт и АВР / ЭСФ</span></li>
+            <li><i>✓</i> <span data-ru="Личный онлайн-кабинет HR бесплатно" data-kk="HR жеке онлайн-кабинеті тегін">Личный онлайн-кабинет HR бесплатно</span></li>
+            <li><i>✓</i> <span data-ru="Сводный заключительный акт медкомиссии" data-kk="Медкомиссияның жиынтық қорытынды актісі">Сводный заключительный акт медкомиссии</span></li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="tag">FAQ</span>
+        <h2 data-ru="Часто задаваемые вопросы" data-kk="Жиі қойылатын сұрақтар">Часто задаваемые вопросы</h2>
+      </div>
+      <div class="faq reveal">
+        <details open>
+          <summary data-ru="Кому обязателен периодический медицинский осмотр?" data-kk="Мерзімді медициналық тексеру кімге міндетті?">Кому обязателен периодический медицинский осмотр?</summary>
+          <p data-ru="Согласно Приказу МЗ РК № ҚР ДСМ-131/2020, периодический медосмотр обязателен для работников, занятых на работах с вредными и опасными условиями труда (строительство, производство, транспорт), а также для декретированных групп (общепит, торговля, пищевая промышленность, образование)."
+             data-kk="ҚР ДСМ № 131/2020 бұйрығына сәйкес мерзімді медициналық тексеру зиянды және қауіпті еңбек жағдайларында (құрылыс, өндіріс, көлік) жұмыс істейтіндерге, сондай-ақ тамақ өнеркәсібі, қоғамдық тамақтану, сауда және білім беру саласының қызметкерлеріне міндетті.">
+            Согласно Приказу МЗ РК № ҚР ДСМ-131/2020, периодический медосмотр обязателен для работников, занятых на работах с вредными и опасными условиями труда (строительство, производство, транспорт), а также для декретированных групп (общепит, торговля, пищевая промышленность, образование).
+          </p>
+        </details>
+        <details>
+          <summary data-ru="Кто выдаёт официальное медицинское заключение?" data-kk="Ресми медициналық қорытындыны кім береді?">Кто выдаёт официальное медицинское заключение?</summary>
+          <p data-ru="Все осмотры и заключения выдаются лицензированными клиниками-партнёрами. MedTekser выступает единым оператором: организует график, распределяет потоки и оцифровывает контроль прохождения."
+             data-kk="Барлық тексерулер мен қорытындыларды лицензиясы бар серіктес клиникалар береді. MedTekser бірыңғай оператор ретінде кестені ұйымдастырады және тексеру барысын цифрландырады.">
+            Все осмотры и заключения выдаются лицензированными клиниками-партнёрами. MedTekser выступает единым оператором: организует график, распределяет потоки и оцифровывает контроль прохождения.
+          </p>
+        </details>
+        <details>
+          <summary data-ru="Как происходит оплата и закрытие документов?" data-kk="Төлем және құжаттарды жабу қалай жүргізіледі?">Как происходит оплата и закрытие документов?</summary>
+          <p data-ru="Безналичным переводом по договору и счёту на оплату для юридических лиц (ТОО / ИП). По завершении предоставляются Акт выполненных работ (АВР), ЭСФ и заключительный акт медкомиссии."
+             data-kk="Заңды тұлғаларға (ЖШС / ЖК) арналған шарт пен төлем шоты бойынша қолма-қол ақшасыз аударым арқылы. Соңында Орындалған жұмыстар актісі (ОЖА), ЭШФ және медкомиссияның қорытынды актісі беріледі.">
+            Безналичным переводом по договору и счёту на оплату для юридических лиц (ТОО / ИП). По завершении предоставляются Акт выполненных работ (АВР), ЭСФ и заключительный акт медкомиссии.
+          </p>
+        </details>
+        <details>
+          <summary data-ru="Возможен ли выезд врачей на территорию предприятия?" data-kk="Дәрігерлер кәсіпорын аумағына шыға ала ма?">Возможен ли выезд врачей на территорию предприятия?</summary>
+          <p data-ru="Да. При количестве сотрудников от 30 человек мобильная медицинская бригада выезжает на объект заказчика со всем необходимым оборудованием без отрыва персонала от производства."
+             data-kk="Иә. Қызметкерлер саны 30 адамнан асқанда көшпелі медициналық бригада барлық қажетті жабдықпен тапсырыс берушінің объектісіне барады.">
+            Да. При количестве сотрудников от 30 человек мобильная медицинская бригада выезжает на объект заказчика со всем необходимым оборудованием без отрыва персонала от производства.
+          </p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="cta-band reveal">
+        <div>
+          <h2 data-ru="Нужна консультация или коммерческое предложение?" data-kk="Кеңес немесе коммерциялық ұсыныс керек пе?">Нужна консультация или коммерческое предложение?</h2>
+          <p data-ru="Напишите нам в WhatsApp или позвоните — подготовим расчёт под ваш штат за 15 минут." data-kk="WhatsApp-қа жазыңыз немесе қоңырау шалыңыз — 15 минут ішінде штатыңызға сай есеп дайындап береміз.">Напишите нам в WhatsApp или позвоните — подготовим расчёт под ваш штат за 15 минут.</p>
+        </div>
+        <div class="flex">
+          <a class="btn white lg" id="cta-wa" target="_blank" rel="noopener" data-ru="Написать в WhatsApp" data-kk="WhatsApp-қа жазу">Написать в WhatsApp</a>
+          <a class="btn light lg" id="cta-phone" href="tel:+77787961219" data-icon="phone" data-size="18">+7 (778) 796-12-19</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="/" class="logo" data-logo></a>
+          <p style="margin-top:14px;max-width:360px"
+             data-ru="Цифровой сервис организации корпоративных медицинских осмотров для бизнеса в Шымкенте и Туркестанской области."
+             data-kk="Шымкент және Түркістан облысындағы бизнеске арналған корпоративтік медициналық тексеруді ұйымдастырудың цифрлық сервисі.">
+            Цифровой сервис организации корпоративных медицинских осмотров для бизнеса в Шымкенте и Туркестанской области.
+          </p>
+        </div>
+        <div>
+          <h4 data-ru="Навигация" data-kk="Навигация">Навигация</h4>
+          <ul>
+            <li><a href="#benefits" data-ru="Преимущества" data-kk="Артықшылықтар">Преимущества</a></li>
+            <li><a href="#pricing" data-ru="Тарифы" data-kk="Тарифтер">Тарифы</a></li>
+            <li><a href="#how" data-ru="Как это работает" data-kk="Қалай жұмыс істейді">Как это работает</a></li>
+            <li><a href="#order" data-ru="Оставить заявку" data-kk="Өтінім қалдыру">Оставить заявку</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 data-ru="Контакты" data-kk="Байланыс">Контакты</h4>
+          <ul>
+            <li data-ru="г. Шымкент, Казахстан" data-kk="Шымкент қ., Қазақстан">г. Шымкент, Казахстан</li>
+            <li><a id="footer-phone" href="tel:+77787961219">+7 (778) 796-12-19</a></li>
+            <li><a id="footer-wa" target="_blank" rel="noopener">WhatsApp: 8 (778) 796-12-19</a></li>
+            <li><a href="/cabinet" data-ru="Личный кабинет компании" data-kk="Компанияның жеке кабинеті">Личный кабинет компании</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span data-ru="© 2026 MedTekser. Все права защищены." data-kk="© 2026 MedTekser. Барлық құқықтар қорғалған.">© 2026 MedTekser. Все права защищены.</span>
+        <a href="/admin" data-ru="Панель оператора" data-kk="Оператор панелі">Панель оператора</a>
+      </div>
+    </div>
+  </footer>
+
+  <a class="wa-float" id="wa-float" target="_blank" rel="noopener" aria-label="WhatsApp"></a>
+
+  <script src="/common.js"></script>
+  <script>
+    let CONFIG = null;
+    let LAST_ORDER = null;
+    const form = document.getElementById("order-form");
+    const $ = (id) => document.getElementById(id);
+    const EXAM_ICONS = { periodic: "stethoscope", preliminary: "clipboard", pre_shift: "truck", checkup: "flask" };
+
+    addEventListener("scroll", () => $("header").classList.toggle("scrolled", scrollY > 10));
+    $("burger").addEventListener("click", () => $("header").classList.toggle("open"));
+    document.querySelectorAll("#nav a").forEach((a) => a.addEventListener("click", () => $("header").classList.remove("open")));
+
+    const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+    }), { threshold: 0.1 });
+    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+
+    const tomorrow = new Date(Date.now() + 864e5);
+    $("f-date").min = tomorrow.toISOString().slice(0, 10);
+
+    function selectedExam() {
+      return (form.querySelector('input[name="exam_type"]:checked') || {}).value || "periodic";
+    }
+
+    function updateCalc() {
+      if (!CONFIG) return;
+      const key = selectedExam();
+      const et = CONFIG.exam_types[key];
+      const n = Math.max(0, parseInt(form.employees_count.value) || 0);
+      const sub = et.price * n;
+      const fee = Math.round(sub * CONFIG.service_fee_percent / 100);
+      $("count-label").textContent = n;
+      $("sum-total").textContent = fmtMoney(sub + fee);
+      $("sum-per").textContent = t(
+        `≈ ${fmtMoney(n ? (sub + fee) / n : 0)} за 1 сотрудника с учётом сопровождения`,
+        `≈ ${fmtMoney(n ? (sub + fee) / n : 0)} сүйемелдеуді қосқанда 1 қызметкерге`
+      );
+      $("sum-type").textContent = examName(et);
+      $("sum-count").textContent = n + " " + t("чел.", "адам");
+      $("sum-sub").textContent = fmtMoney(sub);
+      $("sum-fee").textContent = fmtMoney(fee);
+    }
+
+    function pickExam(key) {
+      const r = form.querySelector('input[name="exam_type"][value="' + key + '"]');
+      if (r) { r.checked = true; updateCalc(); }
+      $("order").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function renderDynamicI18n() {
+      if (!CONFIG) return;
+      const curKey = selectedExam();
+      $("pricing-sub").innerHTML = t(
+        'Стоимость указана за 1 сотрудника. Доплата за вредные факторы — <b>' + fmtMoney(CONFIG.harmful_surcharge) + '</b>, сервисная комиссия платформы — <b>' + CONFIG.service_fee_percent + '%</b>.',
+        'Баға 1 қызметкерге көрсетілген. Зиянды фактор үстемесі — <b>' + fmtMoney(CONFIG.harmful_surcharge) + '</b>, платформаның сервис комиссиясы — <b>' + CONFIG.service_fee_percent + '%</b>.'
+      );
+
+      $("pricing-grid").innerHTML = Object.entries(CONFIG.exam_types).map(([k, et], i) => 
+        '<div class="card hover price-card reveal in ' + (k === "periodic" ? "featured" : "") + '">' +
+          (k === "periodic" ? '<span class="ribbon">' + t("Популярный", "Танымал") + '</span>' : '') +
+          '<div class="feature-ic ' + (k === "periodic" ? "" : ["", "coral", "violet", "amber"][i]) + '" ' + (k === "periodic" ? 'style="background:rgba(255,255,255,.12);color:#5eead4;border-color:rgba(255,255,255,.2)"' : "") + '>' + icon(EXAM_ICONS[k] || "check", 26) + '</div>' +
+          '<h3>' + esc(examName(et)) + '</h3>' +
+          '<div class="amount">' + fmtMoney(et.price) + '</div>' +
+          '<div class="per">' + t("за 1 сотрудника", "1 қызметкерге") + '</div>' +
+          '<p>' + esc(examDesc(et)) + '</p>' +
+          '<button type="button" class="btn ' + (k === "periodic" ? "white" : "ghost") + ' block" onclick="pickExam(\'' + k + '\')">' + t("Выбрать тариф", "Тарифті таңдау") + '</button>' +
+        '</div>').join("");
+
+      $("exam-chips").innerHTML = Object.entries(CONFIG.exam_types).map(([k, et]) => 
+        '<label class="chip">' +
+          '<input type="radio" name="exam_type" value="' + k + '" ' + (k === curKey ? "checked" : "") + '/>' +
+          '<span>' + esc(examName(et)) + ' <small>' + fmtMoney(et.price) + '</small></span>' +
+        '</label>').join("");
+
+      const phone = CONFIG.contact_phone || "+77787961219";
+      const msg = t(
+        "Здравствуйте! Интересует проведение корпоративного медосмотра через MedTekser.",
+        "Сәлеметсіз бе! MedTekser арқылы корпоративтік медициналық тексеру өткізу бойынша сұрағым бар."
+      );
+      const wa = waLink(phone, msg);
+      $("wa-float").href = wa;
+      $("wa-float").innerHTML = WA_ICON + '<span>WhatsApp · 8 778 796 12 19</span>';
+      $("hero-wa").href = wa;
+      $("cta-wa").href = wa;
+      $("footer-wa").href = wa;
+      const pretty = fmtPhone(phone);
+      $("header-phone").href = "tel:" + phone;
+      $("header-phone").innerHTML = icon("phone", 15) + " " + pretty;
+      $("cta-phone").href = "tel:" + phone;
+      $("cta-phone").innerHTML = icon("phone", 18) + " " + pretty;
+      $("footer-phone").href = "tel:" + phone;
+      $("footer-phone").textContent = pretty;
+
+      updateCalc();
+      if (LAST_ORDER) renderOrderSuccess(LAST_ORDER);
+    }
+
+    function renderOrderSuccess(r) {
+      const link = '/cabinet?id=' + r.id + '&code=' + r.access_code;
+      $("order-success").innerHTML = 
+        '<div class="success-box">' +
+          '<div class="check">' + icon("check", 34, 2.5) + '</div>' +
+          '<h3 style="font-size:24px">' + t("Заявка успешно принята!", "Өтінім сәтті қабылданды!") + '</h3>' +
+          '<p class="muted">' + t("Сохраните данные для входа в личный кабинет вашей компании:", "Компанияңыздың жеке кабинетіне кіру деректерін сақтап қойыңыз:") + '</p>' +
+          '<div>' +
+            '<span class="code-pill"><small>' + t("Номер заявки", "Өтінім нөмірі") + '</small><b>#' + r.id + '</b></span>' +
+            '<span class="code-pill"><small>' + t("Код доступа", "Кіру коды") + '</small><b>' + esc(r.access_code) + '</b></span>' +
+          '</div>' +
+          '<p style="margin-top:22px">' +
+            '<a class="btn lg" href="' + link + '">' + t("Перейти в кабинет и загрузить список", "Кабинетке өтіп, тізімді жүктеу") + ' ' + icon("arrowRight", 18) + '</a>' +
+          '</p>' +
+        '</div>';
+    }
+
+    window.onLangChange = renderDynamicI18n;
+
+    api("/api/config").then((cfg) => {
+      CONFIG = cfg;
+      renderDynamicI18n();
+    }).catch(() => toast(t("Не удалось подключиться к серверу", "Серверге қосылу мүмкін болмады"), "err"));
+
+    form.addEventListener("input", () => CONFIG && updateCalc());
+    $("f-bin").addEventListener("input", (e) => (e.target.value = e.target.value.replace(/\D/g, "")));
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errBox = $("order-error");
+      errBox.innerHTML = "";
+      const data = Object.fromEntries(new FormData(form));
+      data.exam_type = selectedExam();
+      if (!data.company.trim() || !data.contact_name.trim() || !data.phone.trim()) {
+        errBox.innerHTML = '<div class="alert err">' + t("Пожалуйста, заполните название компании, контактное лицо и телефон", "Компания атауын, байланыс тұлғаны және телефонды толтырыңыз") + '</div>';
+        return;
+      }
+      if (data.phone.replace(/\D/g, "").length < 10) {
+        errBox.innerHTML = '<div class="alert err">' + t("Введите корректный номер телефона", "Телефон нөмірін толық енгізіңіз") + '</div>';
+        return;
+      }
+      const btn = $("submit-btn");
+      setBusy(btn, true, t("Отправка…", "Жіберілуде…"));
+      try {
+        const r = await api("/api/requests", { method: "POST", body: data });
+        LAST_ORDER = r;
+        form.classList.add("hidden");
+        renderOrderSuccess(r);
+        $("order-success").classList.remove("hidden");
+      } catch (err) {
+        errBox.innerHTML = '<div class="alert err">' + esc(err.message) + '</div>';
+      } finally {
+        setBusy(btn, false);
+      }
+    });
+  </script>
+</body>
+</html>
