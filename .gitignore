@@ -1,0 +1,9 @@
+# Python / SQLite
+__pycache__/
+*.py[cod]
+*.db
+*.db-shm
+*.db-wal
+.env
+data/
+.DS_Store
