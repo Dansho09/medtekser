@@ -9,14 +9,14 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23088471'/%3E%3Cpath d='M8 17h4l2-5 4 9 2-4h4' stroke='white' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="./style.css" />
 </head>
 <body class="app-body">
   <!-- ============ КІРУ ============ -->
   <div class="auth-screen" id="login-screen">
     <form class="auth-card" id="login">
       <div class="auth-top">
-        <a href="/" class="logo" data-logo></a>
+        <a href="./" class="logo" data-logo></a>
         <div data-lang-switch></div>
       </div>
       <h1 data-ru="Панель оператора" data-kk="Оператор панелі">Панель оператора</h1>
@@ -27,14 +27,19 @@
       </div>
       <div id="login-err"></div>
       <button class="btn block" type="submit" id="login-btn" data-ru="Войти" data-kk="Кіру">Войти</button>
-      <p class="muted small center" style="margin:18px 0 0"><a href="/" data-ru="← На главную страницу" data-kk="← Басты бетке қайту">← На главную страницу</a></p>
+      <button class="btn ghost sm block" type="button" style="margin-top:10px" onclick="quickAdminLogin()"
+              data-ru="⚡ Демо-вход оператора в 1 клик"
+              data-kk="⚡ 1 кликпен демо-кіру (оператор)">
+        ⚡ Демо-вход оператора в 1 клик
+      </button>
+      <p class="muted small center" style="margin:18px 0 0"><a href="./" data-ru="← На главную страницу" data-kk="← Басты бетке қайту">← На главную страницу</a></p>
     </form>
   </div>
 
   <!-- ============ НЕГІЗГІ ПАНЕЛЬ ============ -->
   <div class="admin-layout hidden" id="app">
     <aside class="sidebar">
-      <a href="/" class="logo" data-logo></a>
+      <a href="./" class="logo" data-logo></a>
       <a class="side-link active" data-tab="requests">
         <span data-icon="inbox" data-size="18"></span>
         <span data-ru="Заявки" data-kk="Өтінімдер">Заявки</span>
@@ -46,7 +51,7 @@
       </a>
       <div class="bottom">
         <div style="padding:6px 8px"><div data-lang-switch="dark"></div></div>
-        <a class="side-link" href="/" target="_blank">
+        <a class="side-link" href="./" target="_blank">
           <span data-icon="link" data-size="18"></span>
           <span data-ru="Открыть сайт" data-kk="Сайтты ашу">Открыть сайт</span>
         </a>
@@ -150,7 +155,7 @@
     </main>
   </div>
 
-  <script src="/common.js"></script>
+  <script src="./common.js"></script>
   <script>
     let token = localStorage.getItem("admin_token");
     let clinics = [];
@@ -296,9 +301,11 @@
             <div>${badge(r.status)} <span class="muted small" style="margin-left:8px">${esc(examName(r))}</span></div>
           </div>
           <div class="flex">
-            <button class="btn ghost sm" type="button" onclick="copyCabLink('${esc(cabUrl)}')">${icon("link", 16)} ${t("Скопировать ссылку в кабинет", "Кабинет сілтемесін көшіру")}</button>
-            ${waPhone ? `<a class="btn ghost sm" href="https://wa.me/${waPhone}?text=${waText}" target="_blank" rel="noopener">${t("Отправить клиенту в WhatsApp", "Клиентке WhatsApp-қа жіберу")}</a>` : ""}
-            <button class="btn sm" type="button" onclick="exportCsv(${r.id})">${icon("download", 16)} ${t("Скачать CSV (Excel)", "CSV (Excel) жүктеу")}</button>
+            <button class="btn ghost sm" type="button" onclick="openOfficialDocModal('invoice', currentReq)">📄 ${t("Счёт / КП", "Шот / КҰ")}</button>
+            <button class="btn ghost sm" type="button" onclick="openOfficialDocModal('act', currentReq)">📑 ${t("Акт № 131", "№ 131 Акт")}</button>
+            <button class="btn ghost sm" type="button" onclick="copyCabLink('${esc(cabUrl)}')">${icon("link", 16)} ${t("Ссылка в кабинет", "Кабинет сілтемесі")}</button>
+            ${waPhone ? `<a class="btn ghost sm" href="https://wa.me/${waPhone}?text=${waText}" target="_blank" rel="noopener">WhatsApp</a>` : ""}
+            <button class="btn sm" type="button" onclick="exportCsv(${r.id})">${icon("download", 16)} ${t("CSV (Excel)", "CSV (Excel)")}</button>
           </div>
         </div>
 
@@ -378,6 +385,7 @@
                   <th>${t("Вредный фактор", "Зиянды фактор")}</th>
                   <th>${t("Статус", "Мәртебе")}</th>
                   <th>${t("Заключение врача", "Дәрігер қорытындысы")}</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody id="detail-emp-body"></tbody>
@@ -427,7 +435,28 @@
           <td>
             <input value="${esc(e.conclusion || "")}" placeholder="${t("Напр.: Годен к работе без ограничений", "Мысалы: Жұмысқа жарамды, шектеу жоқ")}" onchange="updEmp(${e.id}, {conclusion:this.value})" />
           </td>
+          <td>
+            <div class="flex" style="gap:6px;flex-wrap:nowrap">
+              <button class="btn ghost sm" type="button" style="padding:6px 10px;font-size:12px" onclick="openAdminEmpTicket(${e.id})">🎫 ${t("Талон", "Талон")}</button>
+              <button class="btn ghost sm" type="button" style="padding:6px 10px;font-size:12px" onclick="openAdminEmpPass(${e.id})">🪪 QR</button>
+            </div>
+          </td>
         </tr>`).join("");
+    }
+
+    function openAdminEmpTicket(empId) {
+      const emp = currentReq?.employees?.find((x) => x.id === empId);
+      if (emp) openRouteSheetModal(emp, currentReq);
+    }
+
+    function openAdminEmpPass(empId) {
+      const emp = currentReq?.employees?.find((x) => x.id === empId);
+      if (emp) openMedPassportModal(emp, currentReq);
+    }
+
+    async function quickAdminLogin() {
+      $("l-pass").value = "admin123";
+      $("login").requestSubmit();
     }
 
     async function updEmp(id, body) {
