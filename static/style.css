@@ -520,8 +520,316 @@ td select { padding-right: 30px; background-position: right 10px center; }
 .kv dt { color: var(--muted); font-weight: 500; } .kv dd { margin: 0; font-weight: 600; }
 .back-link { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; margin-bottom: 16px; cursor: pointer; font-size: 14.5px; }
 
+/* =========================================================
+   AI-Сарапшы, Цифрлық Медпаспорт және Құжаттар модалдары
+   ========================================================= */
+.ai-section {
+  background: radial-gradient(900px 450px at 15% 0%, rgba(37, 201, 176, .18), transparent 65%),
+              radial-gradient(800px 450px at 90% 100%, rgba(124, 58, 237, .16), transparent 65%),
+              linear-gradient(165deg, #062925 0%, #041917 100%);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.ai-section h2, .ai-section h3, .ai-section h4 { color: #fff; }
+.ai-grid { display: grid; grid-template-columns: 1fr 1.25fr; gap: 28px; align-items: stretch; }
+@media (max-width: 960px) { .ai-grid { grid-template-columns: 1fr; } }
+
+.ai-panel {
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 20px;
+  padding: 28px;
+  backdrop-filter: blur(12px);
+}
+.ai-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(94, 234, 212, .14); border: 1px solid rgba(94, 234, 212, .35);
+  color: #5eead4; font-size: 12px; font-weight: 800; padding: 5px 12px; border-radius: 999px;
+  text-transform: uppercase; letter-spacing: .08em; margin-bottom: 14px;
+}
+.prof-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.prof-pill {
+  border: 1px solid rgba(255, 255, 255, .18);
+  background: rgba(255, 255, 255, .06);
+  color: rgba(255, 255, 255, .88);
+  padding: 8px 13px; border-radius: 10px; font: 600 13px var(--font);
+  cursor: pointer; transition: all .15s;
+}
+.prof-pill:hover { background: rgba(255, 255, 255, .14); border-color: #5eead4; color: #fff; }
+.prof-pill.active { background: #5eead4; color: #041d1a; border-color: #5eead4; font-weight: 800; }
+
+.ai-result-card {
+  background: #fff; color: var(--ink); border-radius: 20px; padding: 28px;
+  box-shadow: var(--shadow-lg); display: flex; flex-direction: column; justify-content: space-between;
+}
+.ai-result-card h3 { color: var(--ink); font-size: 21px; margin-bottom: 4px; }
+.ai-tags { display: flex; flex-wrap: wrap; gap: 7px; margin: 8px 0 16px; }
+.ai-tag {
+  background: var(--brand-50); border: 1px solid var(--brand-200); color: var(--brand-800);
+  padding: 5px 11px; border-radius: 8px; font-size: 12.5px; font-weight: 700;
+}
+.ai-tag.warn { background: #fff8eb; border-color: #fde6b8; color: #b45309; }
+.ai-tag.danger { background: #fff1f2; border-color: #fecdd3; color: #be123c; }
+.ai-tag.violet { background: #f3efff; border-color: #e4d9ff; color: #6d28d9; }
+
+.fine-box {
+  background: #fff8f6; border: 1.5px solid #ffd5c8; border-radius: 14px; padding: 14px 16px;
+  margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+}
+.fine-box b { color: var(--bad); font-size: 18px; font-weight: 800; }
+
+/* Модалды терезе (Медпаспорт / Құжат / Акт) */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 120; background: rgba(4, 29, 26, .68);
+  backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center;
+  padding: 20px; overflow-y: auto; animation: fadeIn .18s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } }
+.modal-box {
+  background: #fff; color: var(--ink); width: 100%; max-width: 760px; border-radius: 22px;
+  box-shadow: var(--shadow-lg); border: 1px solid var(--line); overflow: hidden;
+  max-height: 92vh; display: flex; flex-direction: column;
+}
+.modal-head {
+  padding: 18px 24px; border-bottom: 1px solid var(--line); background: #f8fbfa;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.modal-head h3 { margin: 0; font-size: 18px; }
+.modal-body { padding: 26px; overflow-y: auto; }
+.modal-foot {
+  padding: 16px 24px; border-top: 1px solid var(--line); background: #f8fbfa;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+
+.medpass-top {
+  display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: center;
+  padding: 18px; background: linear-gradient(135deg, var(--brand-50), #fff);
+  border: 1.5px solid var(--brand-200); border-radius: 16px; margin-bottom: 20px;
+}
+.qr-box {
+  width: 96px; height: 96px; padding: 6px; background: #fff; border: 1px solid var(--line);
+  border-radius: 12px; display: grid; place-items: center; text-align: center;
+}
+.doc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 14px 0; }
+@media (max-width: 600px) { .doc-grid { grid-template-columns: 1fr; } .medpass-top { grid-template-columns: 1fr; } }
+.doc-item {
+  padding: 11px 14px; border: 1px solid var(--line); border-radius: 11px;
+  display: flex; justify-content: space-between; align-items: center; font-size: 13.5px;
+}
+.doc-item b { font-weight: 700; }
+.stamp-seal {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 118px; height: 118px; border: 3px double #088471; border-radius: 50%;
+  color: #088471; font-weight: 800; font-size: 10px; text-align: center;
+  text-transform: uppercase; letter-spacing: .05em; transform: rotate(-8deg);
+  background: rgba(14, 165, 142, .04); padding: 8px;
+}
+
+/* =========================================================
+   Dark Mode (🌙 / ☀️) + Ecosystem Ribbon + Comparison + Clinics Hub
+   ========================================================= */
+.theme-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 34px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--white); color: var(--ink);
+  cursor: pointer; font-size: 15px; transition: all .18s;
+}
+.theme-btn:hover { border-color: var(--brand-500); transform: translateY(-1px); }
+
+[data-theme="dark"] {
+  --bg: #061311;
+  --white: #0c1f1c;
+  --ink: #edfcf9;
+  --ink-2: #b9e6de;
+  --muted: #7da69f;
+  --line: #173833;
+  --line-strong: #235049;
+  --brand-50: rgba(14, 165, 142, .12);
+  --brand-100: rgba(14, 165, 142, .22);
+  --brand-200: rgba(37, 201, 176, .32);
+  --brand-800: #5eead4;
+  --brand-900: #9ceee0;
+}
+[data-theme="dark"] .site-header,
+[data-theme="dark"] .app-header {
+  background: rgba(8, 24, 22, .88);
+  border-bottom-color: var(--line);
+}
+[data-theme="dark"] .section.alt { background: #091917; }
+[data-theme="dark"] .card,
+[data-theme="dark"] .price-card,
+[data-theme="dark"] .clinic-card,
+[data-theme="dark"] .panel,
+[data-theme="dark"] .stat,
+[data-theme="dark"] .faq-item,
+[data-theme="dark"] .calc-form,
+[data-theme="dark"] .ai-result-card,
+[data-theme="dark"] .modal-box,
+[data-theme="dark"] .login-card {
+  background: #0d221f;
+  border-color: #193c36;
+  color: var(--ink);
+}
+[data-theme="dark"] .modal-head,
+[data-theme="dark"] .modal-foot,
+[data-theme="dark"] .table th,
+[data-theme="dark"] .emp-toolbar {
+  background: #081715;
+  border-color: #193c36;
+}
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background: #071614;
+  color: var(--ink);
+  border-color: #1f4740;
+}
+[data-theme="dark"] .fine-box {
+  background: rgba(225, 29, 72, .12);
+  border-color: rgba(225, 29, 72, .35);
+}
+[data-theme="dark"] .medpass-top {
+  background: linear-gradient(135deg, rgba(14, 165, 142, .16), #0d221f);
+}
+
+/* Ecosystem Trust Ribbon */
+.trust-ribbon {
+  background: #07221f;
+  border-top: 1px solid rgba(255, 255, 255, .08);
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+  padding: 14px 0;
+  color: rgba(255, 255, 255, .82);
+  font-size: 13px;
+}
+.trust-items {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+}
+.trust-item {
+  display: inline-flex; align-items: center; gap: 8px; font-weight: 600;
+}
+.trust-item i {
+  display: inline-grid; place-items: center; width: 22px; height: 22px;
+  border-radius: 6px; background: rgba(94, 234, 212, .16); color: #5eead4;
+  font-style: normal; font-size: 12px; font-weight: 800;
+}
+
+/* Comparison Section (Old vs MedTekser) */
+.compare-grid {
+  display: grid; grid-template-columns: 1fr 1.12fr; gap: 24px; align-items: stretch;
+}
+@media (max-width: 900px) { .compare-grid { grid-template-columns: 1fr; } }
+.compare-card {
+  background: var(--white); border: 1px solid var(--line); border-radius: 22px;
+  padding: 30px; position: relative; transition: transform .2s, box-shadow .2s;
+}
+.compare-card.bad-card {
+  border-top: 4px solid #f43f5e;
+}
+.compare-card.good-card {
+  border: 2px solid var(--brand-500);
+  box-shadow: var(--shadow);
+  background: linear-gradient(180deg, var(--brand-50) 0%, var(--white) 32%);
+}
+.compare-list { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 14px; }
+.compare-list li {
+  display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: start;
+  font-size: 14.5px;
+}
+.compare-icon {
+  width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center;
+  font-weight: 800; font-size: 13px;
+}
+.compare-icon.no { background: #ffe4e6; color: #e11d48; }
+.compare-icon.yes { background: #d1fae5; color: #059669; }
+
+/* Upgraded Clinic Hub */
+.clinic-filter-bar {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  flex-wrap: wrap; margin-bottom: 28px;
+}
+.filter-chip {
+  border: 1px solid var(--line-strong); background: var(--white); color: var(--ink-2);
+  padding: 8px 16px; border-radius: 999px; font: 700 13px var(--font);
+  cursor: pointer; transition: all .15s;
+}
+.filter-chip:hover { border-color: var(--brand-500); color: var(--brand-600); }
+.filter-chip.active {
+  background: var(--brand-600); color: #fff; border-color: var(--brand-600);
+  box-shadow: 0 6px 16px -4px rgba(8, 132, 113, .45);
+}
+.clinic-equip { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+.equip-tag {
+  font-size: 11.5px; font-weight: 700; padding: 4px 9px; border-radius: 7px;
+  background: var(--bg); border: 1px solid var(--line); color: var(--ink-2);
+}
+.slot-row {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  padding-top: 12px; margin-top: 12px; border-top: 1px dashed var(--line);
+}
+.slot-pill {
+  font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 6px;
+  background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;
+}
+
+/* Route Sheet Steps */
+.route-steps { display: grid; gap: 10px; margin: 14px 0; }
+.route-step {
+  display: grid; grid-template-columns: 42px 1fr auto; gap: 14px; align-items: center;
+  padding: 12px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--white);
+}
+.route-room {
+  background: var(--brand-600); color: #fff; font-weight: 800; font-size: 12px;
+  padding: 6px 8px; border-radius: 8px; text-align: center;
+}
+
+/* Анти-Фальсификат Реестр Верификаторы (075/у & Санитарлық кітапша) */
+.verify-card {
+  background: linear-gradient(135deg, var(--white) 0%, var(--brand-50) 100%);
+  border: 2px solid var(--brand-400);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: var(--shadow);
+}
+.verify-grid {
+  display: grid; grid-template-columns: 1.05fr 1.2fr; gap: 28px; align-items: center;
+}
+@media (max-width: 920px) { .verify-grid { grid-template-columns: 1fr; } }
+.verify-input-row {
+  display: flex; gap: 10px; margin-top: 12px;
+}
+.verify-res-box {
+  background: var(--white); border: 1.5px solid var(--line-strong); border-radius: 18px;
+  padding: 22px; box-shadow: var(--shadow-sm);
+}
+.verify-stamp {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #ecfdf5; border: 1px solid #6ee7b7; color: #047857;
+  padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 800;
+}
+
+/* MedTech Battle Pitch / Unit Economics Cards */
+.metric-card {
+  background: var(--white); border: 1px solid var(--line); border-radius: 20px;
+  padding: 24px; position: relative; overflow: hidden; box-shadow: var(--shadow-xs);
+}
+.metric-card .big-num {
+  font-size: 32px; font-weight: 800; color: var(--brand-700); letter-spacing: -.03em; margin: 6px 0;
+}
+[data-theme="dark"] .metric-card .big-num { color: #5eead4; }
+[data-theme="dark"] .verify-card {
+  background: linear-gradient(135deg, #0c1f1c 0%, rgba(14, 165, 142, .14) 100%);
+}
+[data-theme="dark"] .verify-res-box,
+[data-theme="dark"] .route-step {
+  background: #091816; border-color: #1c423c;
+}
+
 @media print {
-  .app-header, .no-print, .sidebar, .wa-float { display: none !important; }
-  body, .app-body { background: #fff; }
-  .panel, .stat { box-shadow: none; }
+  .app-header, .no-print, .sidebar, .wa-float, .site-header, .site-footer, .trust-ribbon { display: none !important; }
+  body, .app-body { background: #fff; color: #000; }
+  .panel, .stat, .modal-box { box-shadow: none; border: none; max-height: none; }
+  .modal-backdrop { position: static; background: #fff; padding: 0; }
+  .modal-head .icon-btn, .modal-foot { display: none !important; }
 }
