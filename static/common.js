@@ -75,12 +75,12 @@ const ICON_PATHS = {
 };
 
 function icon(name, size = 20, sw = 2) {
-  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON_PATHS[name] || ""}</svg>`;
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + sw + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICON_PATHS[name] || "") + '</svg>';
 }
 
 const WA_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.7.63.71.23 1.36.2 1.87.12.57-.08 1.76-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35M12.05 21.79h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.82 9.82 0 0 1 2.89 6.99c0 5.45-4.44 9.88-9.88 9.88m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.68 1.45h.01c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.16-3.48-8.41"/></svg>';
 
-const LOGO_HTML = `<span class="logo-mark">${icon("heart", 20, 2.2)}</span><span>Med<b>Tekser</b></span>`;
+const LOGO_HTML = '<span class="logo-mark">' + icon("heart", 20, 2.2) + '</span><span>Med<b>Tekser</b></span>';
 
 function fmtMoney(n) {
   return new Intl.NumberFormat("ru-RU").format(Math.round(n || 0)) + " ₸";
@@ -90,7 +90,7 @@ function fmtPhone(raw) {
   let d = String(raw || "+77787961219").replace(/\D/g, "");
   if (d.length === 11 && d.startsWith("8")) d = "7" + d.slice(1);
   if (d.length === 11 && d.startsWith("7")) {
-    return `+7 (${d.slice(1, 4)}) ${d.slice(4, 7)}-${d.slice(7, 9)}-${d.slice(9, 11)}`;
+    return "+7 (" + d.slice(1, 4) + ") " + d.slice(4, 7) + "-" + d.slice(7, 9) + "-" + d.slice(9, 11);
   }
   return raw;
 }
@@ -102,7 +102,7 @@ function waDigits(raw) {
 }
 
 function waLink(phone, text) {
-  return `https://wa.me/${waDigits(phone)}?text=${encodeURIComponent(text || "")}`;
+  return "https://wa.me/" + waDigits(phone) + "?text=" + encodeURIComponent(text || "");
 }
 
 function fmtDate(s) {
@@ -112,11 +112,11 @@ function fmtDate(s) {
   const monthsRu = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
   const monthsKk = ["қаңтар", "ақпан", "наурыз", "сәуір", "мамыр", "маусым", "шілде", "тамыз", "қыркүйек", "қазан", "қараша", "желтоқсан"];
   const m = LANG === "kk" ? monthsKk : monthsRu;
-  return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`;
+  return d.getDate() + " " + m[d.getMonth()] + " " + d.getFullYear();
 }
 
 function badge(status) {
-  return `<span class="badge ${status}">${statusLabel(status)}</span>`;
+  return '<span class="badge ' + status + '">' + statusLabel(status) + '</span>';
 }
 
 function examName(itemOrType, cfg) {
@@ -154,14 +154,297 @@ function avatarColor(name) {
   return colors[h % colors.length];
 }
 
+// =========================================================
+// GitHub Pages / Serverless Fallback DB (localStorage)
+// Егер сайт GitHub Pages доменінде (github.io) ашылса, барлық API
+// сұраныстар браузер жадында толыққанды жұмыс істейді.
+// =========================================================
+const DEFAULT_CONFIG = {
+  contact_phone: "+77787961219",
+  harmful_surcharge: 5000,
+  service_fee_percent: 10,
+  exam_types: {
+    periodic: {
+      name: "Периодический медосмотр",
+      name_ru: "Периодический медосмотр",
+      name_kk: "Мерзімді медициналық тексеру",
+      price: 15000,
+      desc_ru: "Обязательный ежегодный осмотр сотрудников с вредными производственными факторами (Приказ МЗ РК № ҚР ДСМ-131/2020)",
+      desc_kk: "Зиянды өндірістік факторы бар қызметкерлерге жылына бір рет міндетті тексеру (ҚР ДСМ № 131/2020 бұйрығы)",
+    },
+    preliminary: {
+      name: "Предварительный медосмотр (форма 075/у)",
+      name_ru: "Предварительный медосмотр (форма 075/у)",
+      name_kk: "Жұмысқа кірер алдындағы тексеру (075/е нысаны)",
+      price: 12000,
+      desc_ru: "Медицинское освидетельствование кандидатов при приёме на работу с выдачей официального заключения",
+      desc_kk: "Жаңа қызметкерлерді жұмысқа қабылдар алдында ресми қорытынды бере отырып тексеру",
+    },
+    pre_shift: {
+      name: "Предсменный / предрейсовый осмотр",
+      name_ru: "Предсменный / предрейсовый осмотр",
+      name_kk: "Ауысым / рейс алдындағы тексеру",
+      price: 3000,
+      desc_ru: "Ежедневный допуск водителей и операторов спецтехники к смене (абонемент на месяц за 1 сотрудника)",
+      desc_kk: "Жүргізушілер мен арнайы техника операторларын күнделікті ауысымға жіберу (айына 1 адамға абонемент)",
+    },
+    checkup: {
+      name: "Корпоративный Check-Up",
+      name_ru: "Корпоративный Check-Up",
+      name_kk: "Корпоративтік Check-Up",
+      price: 35000,
+      desc_ru: "Расширенная диагностика здоровья команды: анализы крови, УЗИ, ЭКГ, терапевт и узкие специалисты",
+      desc_kk: "Команда денсаулығын кеңейтілген тексеру: қан талдаулары, УДЗ, ЭКГ, терапевт және бейінді мамандар",
+    },
+  },
+};
+
+function loadLocalDb() {
+  try {
+    const raw = localStorage.getItem("medtekser_db_v1");
+    if (raw) return JSON.parse(raw);
+  } catch (_) {}
+  const initial = {
+    clinics: [
+      { id: 1, name: "«Шипагер» медициналық орталығы", address: "Шымкент, Тәуке хан даңғ. 45", phone: "+7 7252 55 10 20", license: "№ 0184920DF" },
+      { id: 2, name: "«SapaMed» клиникасы", address: "Шымкент, Байтұрсынов к. 18", phone: "+7 7252 44 20 30", license: "№ 0219401DF" },
+      { id: 3, name: "MedTekser көшпелі медбригадасы", address: "Кәсіпорын аумағына шығу", phone: "+7 778 796 12 19", license: "№ 0184920DF-M" },
+    ],
+    requests: [
+      {
+        id: 1, company: "ЖШС «Ontustik Qurylys Group»", bin: "190440012345",
+        contact_name: "Ерлан Сапарұлы", phone: "+7 701 555 44 33", email: "hr@oqg.kz",
+        employees_count: 6, exam_type: "periodic", preferred_date: "2026-11-20",
+        comment: "Көшпелі бригада таңертең сағат 09:00-де келсе жақсы болар еді",
+        status: "in_progress", clinic_id: 3, scheduled_date: "2026-11-20",
+        access_code: "DEMO12", created_at: "2026-11-11T10:00:00",
+      },
+      {
+        id: 2, company: "ЖШС «Shymkent Logistics»", bin: "210840098765",
+        contact_name: "Динара Кенжебекқызы", phone: "+7 702 777 88 99", email: "office@shymlog.kz",
+        employees_count: 25, exam_type: "pre_shift", preferred_date: "2026-11-22",
+        comment: "25 жүргізушіге ай сайынғы ауысым алдындағы тексеру",
+        status: "confirmed", clinic_id: 1, scheduled_date: "2026-11-22",
+        access_code: "LOG777", created_at: "2026-11-11T11:30:00",
+      },
+    ],
+    employees: [
+      { id: 1, request_id: 1, full_name: "Сейітов Нұрлан Асқарұлы", iin: "900101300123", position: "Электрдәнекерлеуші", harmful_factor: "Дәнекерлеу аэрозолі, шу", status: "fit", conclusion: "Годен к работе без ограничений" },
+      { id: 2, request_id: 1, full_name: "Әлиева Айгүл Серікқызы", iin: "950505400456", position: "Мұнара кранының машинисі", harmful_factor: "Биіктіктегі жұмыс", status: "fit", conclusion: "Годна к работе" },
+      { id: 3, request_id: 1, full_name: "Мұратов Дәурен Бақытұлы", iin: "880312300789", position: "Жүк көлігінің жүргізушісі", harmful_factor: "Діріл, шу", status: "fit", conclusion: "Годен к работе" },
+      { id: 4, request_id: 1, full_name: "Қасымов Бекзат Талғатұлы", iin: "921120300551", position: "Монтажшы", harmful_factor: "Биіктіктегі жұмыс, шу", status: "scheduled", conclusion: "" },
+      { id: 5, request_id: 1, full_name: "Жұмабаева Гүлнар Маратқызы", iin: "870714400219", position: "Қойма меңгерушісі", harmful_factor: "", status: "scheduled", conclusion: "" },
+      { id: 6, request_id: 1, full_name: "Оспанов Мақсат Қайратұлы", iin: "980909300882", position: "Бетоншы", harmful_factor: "Цемент шаңы, діріл", status: "pending", conclusion: "" },
+    ],
+    sessions: {},
+  };
+  saveLocalDb(initial);
+  return initial;
+}
+
+function saveLocalDb(db) {
+  try { localStorage.setItem("medtekser_db_v1", JSON.stringify(db)); } catch (_) {}
+}
+
+function calcLocalPrice(examType, count, harmfulCount = 0) {
+  const et = DEFAULT_CONFIG.exam_types[examType] || DEFAULT_CONFIG.exam_types.periodic;
+  const subtotal = et.price * count + DEFAULT_CONFIG.harmful_surcharge * harmfulCount;
+  const fee = Math.round(subtotal * DEFAULT_CONFIG.service_fee_percent / 100);
+  return { per_employee: et.price, subtotal, service_fee: fee, total: subtotal + fee };
+}
+
+function enrichLocalRequest(db, r, includeEmps = false) {
+  const et = DEFAULT_CONFIG.exam_types[r.exam_type] || {};
+  const emps = db.employees.filter((e) => e.request_id === r.id);
+  const harmful = emps.filter((e) => (e.harmful_factor || "").trim()).length;
+  const count = Math.max(r.employees_count, emps.length);
+  const progress = { pending: 0, scheduled: 0, fit: 0, unfit: 0, absent: 0 };
+  emps.forEach((e) => { progress[e.status] = (progress[e.status] || 0) + 1; });
+  const clinic = r.clinic_id ? db.clinics.find((c) => c.id === +r.clinic_id) || null : null;
+  const out = {
+    ...r,
+    exam_name: et.name || r.exam_type,
+    exam_name_ru: et.name_ru || et.name,
+    exam_name_kk: et.name_kk || et.name,
+    price: calcLocalPrice(r.exam_type, count, harmful),
+    progress,
+    employees_loaded: emps.length,
+    clinic,
+  };
+  if (includeEmps) out.employees = emps;
+  return out;
+}
+
+function parseCsvLocal(text) {
+  const lines = String(text || "").trim().split(/\r?\n/).filter((l) => l.trim());
+  const out = [];
+  for (const line of lines) {
+    const sep = line.includes("\t") ? "\t" : (line.includes(";") ? ";" : ",");
+    let cells = line.split(sep).map((c) => c.trim());
+    if (!cells[0] || ["таә", "аты-жөні", "фио", "full_name", "№"].includes(cells[0].toLowerCase())) continue;
+    if (/^\d+$/.test(cells[0]) && cells[0].length < 6 && cells[1]) cells = cells.slice(1);
+    out.push({ full_name: cells[0] || "", iin: cells[1] || "", position: cells[2] || "", harmful_factor: cells[3] || "" });
+  }
+  return out;
+}
+
+function localApi(path, { method = "GET", body, token } = {}) {
+  const db = loadLocalDb();
+  const sess = token ? db.sessions[token] : null;
+  const fail = (msg, status = 400) => { const e = new Error(msg); e.status = status; throw e; };
+
+  if (path === "/api/config" && method === "GET") return DEFAULT_CONFIG;
+  if (path === "/api/logout" && method === "POST") {
+    if (token) { delete db.sessions[token]; saveLocalDb(db); }
+    return { ok: true };
+  }
+  if (path === "/api/requests" && method === "POST") {
+    const count = Math.max(1, parseInt(body.employees_count) || 1);
+    const id = db.requests.reduce((m, r) => Math.max(m, r.id), 0) + 1;
+    const access_code = Math.random().toString(16).slice(2, 8).toUpperCase();
+    const row = {
+      id, company: (body.company || "").trim(), bin: (body.bin || "").trim(),
+      contact_name: (body.contact_name || "").trim(), phone: (body.phone || "").trim(),
+      email: (body.email || "").trim(), employees_count: count,
+      exam_type: body.exam_type || "periodic", preferred_date: body.preferred_date || "",
+      comment: (body.comment || "").trim(), status: "new", clinic_id: null,
+      scheduled_date: null, access_code, created_at: new Date().toISOString().slice(0, 19),
+    };
+    db.requests.unshift(row);
+    saveLocalDb(db);
+    return { id, access_code, price: calcLocalPrice(row.exam_type, count) };
+  }
+  if (path === "/api/cabinet/login" && method === "POST") {
+    const rid = parseInt(body.request_id) || 0;
+    const code = String(body.code || "").trim().toUpperCase();
+    const r = db.requests.find((x) => x.id === rid && x.access_code.toUpperCase() === code);
+    if (!r) fail(t("Неверный номер заявки или код доступа", "Өтінім нөмірі немесе кіру коды қате"), 401);
+    const tok = "cab_" + Math.random().toString(36).slice(2);
+    db.sessions[tok] = { role: "company", request_id: r.id };
+    saveLocalDb(db);
+    return { token: tok };
+  }
+  if (path === "/api/cabinet" && method === "GET") {
+    if (!sess || sess.role !== "company") fail(t("Нет доступа", "Рұқсат жоқ"), 401);
+    const r = db.requests.find((x) => x.id === sess.request_id);
+    if (!r) fail(t("Заявка не найдена", "Өтінім табылмады"), 404);
+    return enrichLocalRequest(db, r, true);
+  }
+  if (path === "/api/cabinet/employees" && method === "POST") {
+    if (!sess || sess.role !== "company") fail(t("Нет доступа", "Рұқсат жоқ"), 401);
+    const list = body.employees || parseCsvLocal(body.csv);
+    if (!list.length) fail(t("Список сотрудников пуст", "Қызметкерлер тізімі бос"), 400);
+    let nextId = db.employees.reduce((m, e) => Math.max(m, e.id), 0) + 1;
+    list.forEach((e) => {
+      db.employees.push({
+        id: nextId++, request_id: sess.request_id, full_name: e.full_name,
+        iin: e.iin || "", position: e.position || "", harmful_factor: e.harmful_factor || "",
+        status: "pending", conclusion: "",
+      });
+    });
+    saveLocalDb(db);
+    return { added: list.length };
+  }
+  if (path.startsWith("/api/cabinet/employees/") && method === "DELETE") {
+    if (!sess || sess.role !== "company") fail(t("Нет доступа", "Рұқсат жоқ"), 401);
+    const eid = parseInt(path.split("/").pop());
+    db.employees = db.employees.filter((e) => !(e.id === eid && e.request_id === sess.request_id && e.status === "pending"));
+    saveLocalDb(db);
+    return { ok: true };
+  }
+  if (path === "/api/admin/login" && method === "POST") {
+    if (String(body.password || "") !== "admin123") fail(t("Неверный пароль", "Құпиясөз қате"), 401);
+    const tok = "adm_" + Math.random().toString(36).slice(2);
+    db.sessions[tok] = { role: "admin" };
+    saveLocalDb(db);
+    return { token: tok };
+  }
+  if (path.startsWith("/api/admin/")) {
+    if (!sess || sess.role !== "admin") fail(t("Нет доступа", "Рұқсат жоқ"), 401);
+    if (path === "/api/admin/requests" && method === "GET") {
+      return [...db.requests].sort((a, b) => b.id - a.id).map((r) => enrichLocalRequest(db, r));
+    }
+    if (path === "/api/admin/clinics" && method === "GET") return db.clinics;
+    if (path === "/api/admin/clinics" && method === "POST") {
+      const id = db.clinics.reduce((m, c) => Math.max(m, c.id), 0) + 1;
+      db.clinics.push({ id, name: body.name, address: body.address || "", phone: body.phone || "", license: body.license || "" });
+      saveLocalDb(db);
+      return { ok: true };
+    }
+    if (path.startsWith("/api/admin/clinics/") && method === "DELETE") {
+      const cid = parseInt(path.split("/").pop());
+      db.clinics = db.clinics.filter((c) => c.id !== cid);
+      saveLocalDb(db);
+      return { ok: true };
+    }
+    if (path === "/api/admin/stats" && method === "GET") {
+      const items = db.requests.map((r) => enrichLocalRequest(db, r));
+      const active = items.filter((i) => i.status !== "cancelled");
+      const paid = active.filter((i) => i.status !== "new");
+      return {
+        requests: items.length,
+        new: items.filter((i) => i.status === "new").length,
+        employees: active.reduce((s, i) => s + Math.max(i.employees_count, i.employees_loaded), 0),
+        examined: active.reduce((s, i) => s + i.progress.fit + i.progress.unfit, 0),
+        revenue: paid.reduce((s, i) => s + i.price.total, 0),
+        service_fee: paid.reduce((s, i) => s + i.price.service_fee, 0),
+      };
+    }
+    const parts = path.strip ? path.split("/") : path.replace(/^\/+|\/+$/g, "").split("/");
+    if (parts.length === 4 && parts[2] === "requests" && method === "GET") {
+      const r = db.requests.find((x) => x.id === +parts[3]);
+      if (!r) fail("Not found", 404);
+      return enrichLocalRequest(db, r, true);
+    }
+    if (parts.length === 4 && parts[2] === "requests" && method === "PUT") {
+      const r = db.requests.find((x) => x.id === +parts[3]);
+      if (!r) fail("Not found", 404);
+      if (body.status) r.status = body.status;
+      if ("clinic_id" in body) r.clinic_id = body.clinic_id ? +body.clinic_id : null;
+      if ("scheduled_date" in body) r.scheduled_date = body.scheduled_date || null;
+      saveLocalDb(db);
+      return { ok: true };
+    }
+    if (parts.length === 5 && parts[2] === "requests" && parts[4] === "employees" && method === "PUT") {
+      const rid = +parts[3];
+      db.employees.forEach((e) => {
+        if (e.request_id === rid && (e.status === "pending" || e.status === "scheduled")) e.status = body.status;
+      });
+      saveLocalDb(db);
+      return { ok: true };
+    }
+    if (parts.length === 4 && parts[2] === "employees" && method === "PUT") {
+      const e = db.employees.find((x) => x.id === +parts[3]);
+      if (e) {
+        if (body.status) e.status = body.status;
+        if (body.conclusion !== undefined) e.conclusion = body.conclusion;
+        saveLocalDb(db);
+      }
+      return { ok: true };
+    }
+  }
+  fail("Not found", 404);
+}
+
+let USE_LOCAL_API = location.hostname.endsWith("github.io") || location.protocol === "file:";
+
 async function api(path, { method = "GET", body, token } = {}) {
+  if (USE_LOCAL_API) {
+    return localApi(path, { method, body, token });
+  }
   const headers = { "Content-Type": "application/json" };
   if (token) headers.Authorization = "Bearer " + token;
   let res;
   try {
     res = await fetch(path, { method, headers, body: body ? JSON.stringify(body) : undefined });
   } catch (e) {
-    throw new Error(t("Проверьте подключение к интернету", "Интернет байланысын тексеріңіз"));
+    USE_LOCAL_API = true;
+    return localApi(path, { method, body, token });
+  }
+  const ct = res.headers.get("Content-Type") || "";
+  if ((res.status === 404 || res.status === 405) && !ct.includes("application/json")) {
+    USE_LOCAL_API = true;
+    return localApi(path, { method, body, token });
   }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
@@ -173,9 +456,29 @@ async function api(path, { method = "GET", body, token } = {}) {
 }
 
 async function downloadFile(path, token, filename) {
-  const res = await fetch(path, { headers: { Authorization: "Bearer " + token } });
-  if (!res.ok) throw new Error(t("Не удалось скачать файл", "Жүктеу мүмкін болмады"));
-  const blob = await res.blob();
+  if (!USE_LOCAL_API) {
+    try {
+      const res = await fetch(path, { headers: { Authorization: "Bearer " + token } });
+      if (res.ok) {
+        const blob = await res.blob();
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        return;
+      }
+    } catch (_) {}
+  }
+  // Fallback CSV generation from localStorage DB
+  const db = loadLocalDb();
+  const rid = parseInt(path.split("/")[4]) || 1;
+  const rows = [["№", "ФИО / ТАӘ", "ИИН / ЖСН", "Должность / Лауазымы", "Вредный фактор / Зиянды фактор", "Статус / Мәртебе", "Заключение / Қорытынды"]];
+  db.employees.filter((e) => e.request_id === rid).forEach((e, i) => {
+    rows.push([i + 1, e.full_name, e.iin, e.position, e.harmful_factor, statusLabel(e.status), e.conclusion || ""]);
+  });
+  const csv = "\ufeff" + rows.map((r) => r.map((c) => '"' + String(c ?? "").replace(/"/g, '""') + '"').join(";")).join("\r\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = filename;
@@ -199,19 +502,19 @@ function toast(msg, type = "") {
 
 function progressBar(progress, total) {
   if (!total) return '<div class="progress"></div>';
-  return `<div class="progress">${Object.entries(PROGRESS_COLORS)
-    .map(([k, c]) => `<div style="width:${(100 * (progress[k] || 0)) / total}%;background:${c}"></div>`)
-    .join("")}</div>`;
+  return '<div class="progress">' + Object.entries(PROGRESS_COLORS)
+    .map(([k, c]) => '<div style="width:' + ((100 * (progress[k] || 0)) / total) + '%;background:' + c + '"></div>')
+    .join("") + '</div>';
 }
 
 function progressLegend(p) {
-  return `<div class="legend">
-    <span><i style="background:${PROGRESS_COLORS.fit}"></i>${statusLabel("fit")}: <b>${p.fit}</b></span>
-    <span><i style="background:${PROGRESS_COLORS.unfit}"></i>${statusLabel("unfit")}: <b>${p.unfit}</b></span>
-    <span><i style="background:${PROGRESS_COLORS.absent}"></i>${statusLabel("absent")}: <b>${p.absent}</b></span>
-    <span><i style="background:${PROGRESS_COLORS.scheduled}"></i>${statusLabel("scheduled")}: <b>${p.scheduled}</b></span>
-    <span><i style="background:#d1d9d7"></i>${statusLabel("pending")}: <b>${p.pending}</b></span>
-  </div>`;
+  return '<div class="legend">' +
+    '<span><i style="background:' + PROGRESS_COLORS.fit + '"></i>' + statusLabel("fit") + ': <b>' + p.fit + '</b></span>' +
+    '<span><i style="background:' + PROGRESS_COLORS.unfit + '"></i>' + statusLabel("unfit") + ': <b>' + p.unfit + '</b></span>' +
+    '<span><i style="background:' + PROGRESS_COLORS.absent + '"></i>' + statusLabel("absent") + ': <b>' + p.absent + '</b></span>' +
+    '<span><i style="background:' + PROGRESS_COLORS.scheduled + '"></i>' + statusLabel("scheduled") + ': <b>' + p.scheduled + '</b></span>' +
+    '<span><i style="background:#d1d9d7"></i>' + statusLabel("pending") + ': <b>' + p.pending + '</b></span>' +
+  '</div>';
 }
 
 function setBusy(btn, busy, text) {
@@ -225,10 +528,8 @@ function renderLangSwitchers() {
   document.querySelectorAll("[data-lang-switch]").forEach((wrap) => {
     const isDark = wrap.dataset.langSwitch === "dark";
     wrap.className = "lang-switch" + (isDark ? " dark" : "");
-    wrap.innerHTML = `
-      <button type="button" class="lang-btn ${LANG === "ru" ? "active" : ""}" onclick="setLang('ru')">RU</button>
-      <button type="button" class="lang-btn ${LANG === "kk" ? "active" : ""}" onclick="setLang('kk')">KZ</button>
-    `;
+    wrap.innerHTML = '<button type="button" class="lang-btn ' + (LANG === "ru" ? "active" : "") + '" onclick="setLang(\'ru\')">RU</button>' +
+      '<button type="button" class="lang-btn ' + (LANG === "kk" ? "active" : "") + '" onclick="setLang(\'kk\')">KZ</button>';
   });
 }
 
