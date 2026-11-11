@@ -75,12 +75,12 @@ const ICON_PATHS = {
 };
 
 function icon(name, size = 20, sw = 2) {
-  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + sw + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICON_PATHS[name] || "") + '</svg>';
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON_PATHS[name] || ""}</svg>`;
 }
 
 const WA_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.7.63.71.23 1.36.2 1.87.12.57-.08 1.76-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35M12.05 21.79h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.82 9.82 0 0 1 2.89 6.99c0 5.45-4.44 9.88-9.88 9.88m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.68 1.45h.01c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.16-3.48-8.41"/></svg>';
 
-const LOGO_HTML = '<span class="logo-mark">' + icon("heart", 20, 2.2) + '</span><span>Med<b>Tekser</b></span>';
+const LOGO_HTML = `<span class="logo-mark">${icon("heart", 20, 2.2)}</span><span>Med<b>Tekser</b></span>`;
 
 function fmtMoney(n) {
   return new Intl.NumberFormat("ru-RU").format(Math.round(n || 0)) + " ₸";
@@ -90,7 +90,7 @@ function fmtPhone(raw) {
   let d = String(raw || "+77787961219").replace(/\D/g, "");
   if (d.length === 11 && d.startsWith("8")) d = "7" + d.slice(1);
   if (d.length === 11 && d.startsWith("7")) {
-    return "+7 (" + d.slice(1, 4) + ") " + d.slice(4, 7) + "-" + d.slice(7, 9) + "-" + d.slice(9, 11);
+    return `+7 (${d.slice(1, 4)}) ${d.slice(4, 7)}-${d.slice(7, 9)}-${d.slice(9, 11)}`;
   }
   return raw;
 }
@@ -102,7 +102,7 @@ function waDigits(raw) {
 }
 
 function waLink(phone, text) {
-  return "https://wa.me/" + waDigits(phone) + "?text=" + encodeURIComponent(text || "");
+  return `https://wa.me/${waDigits(phone)}?text=${encodeURIComponent(text || "")}`;
 }
 
 function fmtDate(s) {
@@ -112,11 +112,11 @@ function fmtDate(s) {
   const monthsRu = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
   const monthsKk = ["қаңтар", "ақпан", "наурыз", "сәуір", "мамыр", "маусым", "шілде", "тамыз", "қыркүйек", "қазан", "қараша", "желтоқсан"];
   const m = LANG === "kk" ? monthsKk : monthsRu;
-  return d.getDate() + " " + m[d.getMonth()] + " " + d.getFullYear();
+  return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`;
 }
 
 function badge(status) {
-  return '<span class="badge ' + status + '">' + statusLabel(status) + '</span>';
+  return `<span class="badge ${status}">${statusLabel(status)}</span>`;
 }
 
 function examName(itemOrType, cfg) {
@@ -477,7 +477,7 @@ async function downloadFile(path, token, filename) {
   db.employees.filter((e) => e.request_id === rid).forEach((e, i) => {
     rows.push([i + 1, e.full_name, e.iin, e.position, e.harmful_factor, statusLabel(e.status), e.conclusion || ""]);
   });
-  const csv = "\ufeff" + rows.map((r) => r.map((c) => '"' + String(c ?? "").replace(/"/g, '""') + '"').join(";")).join("\r\n");
+  const csv = "\ufeff" + rows.map((r) => r.map((c) => `"${String(c ?? "").replace(/"/g, '""')}"`).join(";")).join("\r\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -502,19 +502,19 @@ function toast(msg, type = "") {
 
 function progressBar(progress, total) {
   if (!total) return '<div class="progress"></div>';
-  return '<div class="progress">' + Object.entries(PROGRESS_COLORS)
-    .map(([k, c]) => '<div style="width:' + ((100 * (progress[k] || 0)) / total) + '%;background:' + c + '"></div>')
-    .join("") + '</div>';
+  return `<div class="progress">${Object.entries(PROGRESS_COLORS)
+    .map(([k, c]) => `<div style="width:${(100 * (progress[k] || 0)) / total}%;background:${c}"></div>`)
+    .join("")}</div>`;
 }
 
 function progressLegend(p) {
-  return '<div class="legend">' +
-    '<span><i style="background:' + PROGRESS_COLORS.fit + '"></i>' + statusLabel("fit") + ': <b>' + p.fit + '</b></span>' +
-    '<span><i style="background:' + PROGRESS_COLORS.unfit + '"></i>' + statusLabel("unfit") + ': <b>' + p.unfit + '</b></span>' +
-    '<span><i style="background:' + PROGRESS_COLORS.absent + '"></i>' + statusLabel("absent") + ': <b>' + p.absent + '</b></span>' +
-    '<span><i style="background:' + PROGRESS_COLORS.scheduled + '"></i>' + statusLabel("scheduled") + ': <b>' + p.scheduled + '</b></span>' +
-    '<span><i style="background:#d1d9d7"></i>' + statusLabel("pending") + ': <b>' + p.pending + '</b></span>' +
-  '</div>';
+  return `<div class="legend">
+    <span><i style="background:${PROGRESS_COLORS.fit}"></i>${statusLabel("fit")}: <b>${p.fit}</b></span>
+    <span><i style="background:${PROGRESS_COLORS.unfit}"></i>${statusLabel("unfit")}: <b>${p.unfit}</b></span>
+    <span><i style="background:${PROGRESS_COLORS.absent}"></i>${statusLabel("absent")}: <b>${p.absent}</b></span>
+    <span><i style="background:${PROGRESS_COLORS.scheduled}"></i>${statusLabel("scheduled")}: <b>${p.scheduled}</b></span>
+    <span><i style="background:#d1d9d7"></i>${statusLabel("pending")}: <b>${p.pending}</b></span>
+  </div>`;
 }
 
 function setBusy(btn, busy, text) {
@@ -528,8 +528,10 @@ function renderLangSwitchers() {
   document.querySelectorAll("[data-lang-switch]").forEach((wrap) => {
     const isDark = wrap.dataset.langSwitch === "dark";
     wrap.className = "lang-switch" + (isDark ? " dark" : "");
-    wrap.innerHTML = '<button type="button" class="lang-btn ' + (LANG === "ru" ? "active" : "") + '" onclick="setLang(\'ru\')">RU</button>' +
-      '<button type="button" class="lang-btn ' + (LANG === "kk" ? "active" : "") + '" onclick="setLang(\'kk\')">KZ</button>';
+    wrap.innerHTML = `
+      <button type="button" class="lang-btn ${LANG === "ru" ? "active" : ""}" onclick="setLang('ru')">RU</button>
+      <button type="button" class="lang-btn ${LANG === "kk" ? "active" : ""}" onclick="setLang('kk')">KZ</button>
+    `;
   });
 }
 
@@ -556,10 +558,473 @@ function setLang(lang) {
   applyTranslations();
 }
 
+// =========================================================
+// MedTekser AI — Приказ МЗ РК № ҚР ДСМ-131/2020 сарапшысы,
+// Цифрлық Медпаспорт (QR) және Ресми Құжаттар Генераторы
+// =========================================================
+const AI_PROFESSIONS = [
+  {
+    key: "welder",
+    title_ru: "Электросварщик / Газосварщик",
+    title_kk: "Электрдәнекерлеуші / Газбен дәнекерлеуші",
+    clause: "Пункт 1.14, 4.1 Приказа МЗ РК № 131/2020",
+    factors_ru: ["Сварочные аэрозоли (марганец, кремний)", "Производственный шум >80 дБ", "УФ-излучение", "Физические перегрузки"],
+    factors_kk: ["Дәнекерлеу аэрозольдері (марганец, кремний)", "Өндірістік шу >80 дБ", "УК-сәулелену", "Физикалық жүктеме"],
+    doctors_ru: ["Профпатолог", "Терапевт", "Невропатолог", "Офтальмолог", "Отоларинголог (ЛОР)", "Дерматовенеролог", "Хирург"],
+    doctors_kk: ["Профпатолог", "Терапевт", "Невропатолог", "Офтальмолог", "Отоларинголог (ЛОР)", "Дерматовенеролог", "Хирург"],
+    tests_ru: ["Спирометрия (ФВД)", "Тональная аудиометрия", "Рентгенография легких", "ЭКГ", "ОАК + ретикулоциты", "Биометрия глаз"],
+    tests_kk: ["Спирометрия (СДФ)", "Тональды аудиометрия", "Өкпе рентгенографиясы", "ЭКГ", "ЖҚТ + ретикулоциттер", "Көз биометриясы"],
+    freq_ru: "1 раз в 12 месяцев",
+    freq_kk: "12 айда 1 рет",
+    exam_type: "periodic",
+  },
+  {
+    key: "crane",
+    title_ru: "Монтажник-высотник / Крановщик",
+    title_kk: "Биіктіктегі монтажшы / Кран машинисі",
+    clause: "Пункт 1 (Прил. 2) — Работы на высоте и верхолазные работы",
+    factors_ru: ["Работы на высоте >1.8 м", "Управление подъемными механизмами", "Повышенное напряжение зрения"],
+    factors_kk: ["1.8 м-ден жоғары биіктіктегі жұмыс", "Көтергіш механизмдерді басқару", "Көру мүшесіне жоғары жүктеме"],
+    doctors_ru: ["Профпатолог", "Терапевт", "Невропатолог", "Офтальмолог", "Отоларинголог", "Хирург", "Психиатр-нарколог"],
+    doctors_kk: ["Профпатолог", "Терапевт", "Невропатолог", "Офтальмолог", "Отоларинголог", "Хирург", "Психиатр-нарколог"],
+    tests_ru: ["Исследование вестибулярного аппарата", "Периметрия (поля зрения)", "ЭКГ", "Аудиометрия", "Глюкоза крови"],
+    tests_kk: ["Вестибулярлық аппаратты зерттеу", "Периметрия (көру өрісі)", "ЭКГ", "Аудиометрия", "Қандағы глюкоза"],
+    freq_ru: "1 раз в 12 месяцев",
+    freq_kk: "12 айда 1 рет",
+    exam_type: "periodic",
+  },
+  {
+    key: "driver",
+    title_ru: "Водитель грузового / пассажирского транспорта",
+    title_kk: "Жүк / жолаушылар көлігінің жүргізушісі",
+    clause: "Пункт 10 (Прил. 2) + Предсменное освидетельствование",
+    factors_ru: ["Управление наземным транспортом", "Общая вибрация", "Шум", "Ночные смены"],
+    factors_kk: ["Жерүсті көлігін басқару", "Жалпы діріл", "Шу", "Түнгі ауысымдар"],
+    doctors_ru: ["Терапевт", "Невропатолог", "Офтальмолог", "Отоларинголог", "Хирург", "Нарколог / Психиатр"],
+    doctors_kk: ["Терапевт", "Невропатолог", "Офтальмолог", "Отоларинголог", "Хирург", "Нарколог / Психиатр"],
+    tests_ru: ["Ежедневный предрейсовый осмотр (АД, пульс, алкотест)", "ЭКГ", "Острота и поля зрения", "Паллестезиометрия"],
+    tests_kk: ["Күнделікті рейс алдындағы тексеру (АҚ, пульс, алкотест)", "ЭКГ", "Көру өткірлігі мен өрісі", "Паллестезиометрия"],
+    freq_ru: "Ежедневно (предрейсовый) + 1 раз в год",
+    freq_kk: "Күн сайын (рейс алдында) + жылына 1 рет",
+    exam_type: "pre_shift",
+  },
+  {
+    key: "food",
+    title_ru: "Повар / Работник пищеблока и HoReCa (Санкнижка)",
+    title_kk: "Аспаз / Тамақ өнеркәсібі және HoReCa (Санкітапша)",
+    clause: "Декретированная группа населения (Приказ МЗ РК № 131/2020)",
+    factors_ru: ["Контакт с пищевыми продуктами", "Повышенная температура воздуха", "Локальные мышечные нагрузки"],
+    factors_kk: ["Тамақ өнімдерімен байланыс", "Жоғары ауа температурасы", "Жергілікті бұлшықет жүктемесі"],
+    doctors_ru: ["Терапевт", "Дерматовенеролог", "Инфекционист (по показаниям)"],
+    doctors_kk: ["Терапевт", "Дерматовенеролог", "Инфекционист (көрсетілім бойынша)"],
+    tests_ru: ["Бак. посев на кишечную группу", "Мазок на стафилококк", "Анализ на гельминтозы", "Кровь на сифилис (RW)", "Флюорография"],
+    tests_kk: ["Ішек тобына бак. себу", "Стафилококкқа жағынды", "Гельминтозға талдау", "Мерезге қан (RW)", "Флюорография"],
+    freq_ru: "1 раз в 12 месяцев (баканализы при поступлении)",
+    freq_kk: "12 айда 1 рет",
+    exam_type: "periodic",
+  },
+  {
+    key: "chem",
+    title_ru: "Оператор НПЗ / Химическое и цементное производство",
+    title_kk: "МӨЗ операторы / Химия және цемент өндірісі",
+    clause: "Пункт 1.1, 1.29, 2.4 Приказа МЗ РК № 131/2020",
+    factors_ru: ["Углеводороды нефти", "Силикатсодержащая и цементная пыль", "Производственный шум", "Химические реагенты"],
+    factors_kk: ["Мұнай көмірсутектері", "Силикатты және цемент шаңы", "Өндірістік шу", "Химиялық реагенттер"],
+    doctors_ru: ["Профпатолог", "Терапевт", "Пульмонолог / Аллерголог", "Невропатолог", "Дерматовенеролог", "Офтальмолог", "ЛОР"],
+    doctors_kk: ["Профпатолог", "Терапевт", "Пульмонолог / Аллерголог", "Невропатолог", "Дерматовенеролог", "Офтальмолог", "ЛОР"],
+    tests_ru: ["Спирометрия (ФВД)", "Рентген грудной клетки в 2 проекциях", "Печеночные пробы (АЛТ, АСТ, билирубин)", "ОАК, ОАМ", "ЭКГ"],
+    tests_kk: ["Спирометрия (СДФ)", "Кеуде қуысының рентгені", "Бауыр сынамалары (АЛТ, АСТ, билирубин)", "ЖҚТ, ЖНТ", "ЭКГ"],
+    freq_ru: "1 раз в 12 месяцев",
+    freq_kk: "12 айда 1 рет",
+    exam_type: "periodic",
+  },
+  {
+    key: "edu",
+    title_ru: "Учитель / Воспитатель детского сада / Медработник",
+    title_kk: "Мұғалім / Балабақша тәрбиешісі / Медқызметкер",
+    clause: "Декретированная группа — Образование и Здравоохранение",
+    factors_ru: ["Работа с детьми и пациентами", "Голосо-речевые нагрузки", "Биологический фактор"],
+    factors_kk: ["Балалармен және пациенттермен жұмыс", "Дауыс-сөйлеу жүктемесі", "Биологиялық фактор"],
+    doctors_ru: ["Терапевт", "Отоларинголог", "Дерматовенеролог"],
+    doctors_kk: ["Терапевт", "Отоларинголог", "Дерматовенеролог"],
+    tests_ru: ["Флюорография", "Кровь на микрореакцию (RW)", "Бактериологическое исследование", "Мазок из зева и носа"],
+    tests_kk: ["Флюорография", "Микрореакцияға қан (RW)", "Бактериологиялық зерттеу", "Тамақ пен мұрыннан жағынды"],
+    freq_ru: "1 раз в 12 месяцев",
+    freq_kk: "12 айда 1 рет",
+    exam_type: "periodic",
+  },
+];
+
+function analyzeProfession(keyOrQuery) {
+  const q = String(keyOrQuery || "").toLowerCase().trim();
+  const exact = AI_PROFESSIONS.find((p) => p.key === q);
+  if (exact) return exact;
+  if (/свар|дәнекер|газорез|слесар|токар/i.test(q)) return AI_PROFESSIONS[0];
+  if (/высот|биік|кран|монтаж|строп|электрик/i.test(q)) return AI_PROFESSIONS[1];
+  if (/водит|жүргіз|трактор|экскават|погруз|курьер/i.test(q)) return AI_PROFESSIONS[2];
+  if (/повар|аспаз|кондит|пекар|официант|кассир|продав/i.test(q)) return AI_PROFESSIONS[3];
+  if (/нефт|мұнай|цемент|бетон|хим|шахт|горн|дроб/i.test(q)) return AI_PROFESSIONS[4];
+  if (/учит|мұғал|воспит|тәрбие|врач|дәріг|медсест/i.test(q)) return AI_PROFESSIONS[5];
+  return AI_PROFESSIONS[0];
+}
+
+// Векторлық SVG QR-код генераторы (интернетсіз де жұмыс істейді)
+function svgQrCode(seedText, size = 84) {
+  const n = 21;
+  const grid = Array.from({ length: n }, () => Array(n).fill(0));
+  const finder = (r0, c0) => {
+    for (let r = 0; r < 7; r++) for (let c = 0; c < 7; c++) {
+      grid[r0 + r][c0 + c] = (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4)) ? 1 : 0;
+    }
+  };
+  finder(0, 0); finder(0, n - 7); finder(n - 7, 0);
+  let h = 2166136261;
+  for (const ch of String(seedText || "MEDTEKSER")) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+    if ((r < 8 && c < 8) || (r < 8 && c >= n - 8) || (r >= n - 8 && c < 8)) continue;
+    h = Math.imul(h ^ ((r * 31) + c), 1664525) + 1013904223 >>> 0;
+    grid[r][c] = (h >>> 16) & 1;
+  }
+  let rects = "";
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+    if (grid[r][c]) rects += `<rect x="${c}" y="${r}" width="1" height="1"/>`;
+  }
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${n} ${n}" fill="#0b1716" shape-rendering="crispEdges" aria-label="QR">${rects}</svg>`;
+}
+
+function closeAnyModal() {
+  document.querySelectorAll(".modal-backdrop").forEach((m) => m.remove());
+}
+
+// Цифрлық Медициналық Паспорт (Digital MedPass № 075/у & Приказ № 131)
+function openMedPassportModal(emp, req) {
+  closeAnyModal();
+  const prof = analyzeProfession((emp.position || "") + " " + (emp.harmful_factor || ""));
+  const docs = LANG === "kk" ? prof.doctors_kk : prof.doctors_ru;
+  const tests = LANG === "kk" ? prof.tests_kk : prof.tests_ru;
+  const isFit = emp.status === "fit";
+  const isUnfit = emp.status === "unfit";
+  const passId = `MT-2026-${String(req?.id || 1).padStart(3, "0")}-${String(emp.id || 1).padStart(4, "0")}`;
+  const qr = svgQrCode(passId + "|" + (emp.iin || "") + "|" + emp.status, 84);
+  const clinicName = req?.clinic?.name || "МЦ «Шипагер» (Лиц. № 0184920DF)";
+
+  const wrap = document.createElement("div");
+  wrap.className = "modal-backdrop";
+  wrap.addEventListener("click", (e) => { if (e.target === wrap) closeAnyModal(); });
+  wrap.innerHTML = `
+    <div class="modal-box">
+      <div class="modal-head">
+        <div>
+          <span class="muted small">${t("Цифровой медицинский паспорт · Форма № 075/у & Приказ № 131", "Цифрлық медициналық паспорт · № 075/е нысаны және № 131 бұйрық")}</span>
+          <h3>${esc(emp.full_name)}</h3>
+        </div>
+        <button class="icon-btn" onclick="closeAnyModal()" title="Закрыть">${icon("x", 18)}</button>
+      </div>
+      <div class="modal-body">
+        <div class="medpass-top">
+          <div>
+            <div style="margin-bottom:8px">${badge(emp.status)} <span class="muted small" style="margin-left:8px">ID: <b>${passId}</b></span></div>
+            <div style="font-size:14.5px">
+              <b>${t("Компания:", "Компания:")}</b> ${esc(req?.company || "—")}<br/>
+              <b>${t("ИИН:", "ЖСН:")}</b> ${esc(emp.iin || "—")} · <b>${t("Должность:", "Лауазымы:")}</b> ${esc(emp.position || "—")}<br/>
+              <b>${t("Вредные факторы:", "Зиянды факторлар:")}</b> ${esc(emp.harmful_factor || (LANG === "kk" ? prof.factors_kk.join(", ") : prof.factors_ru.join(", ")))}<br/>
+              <b>${t("Медорганизация:", "Медұйым:")}</b> ${esc(clinicName)}
+            </div>
+          </div>
+          <div class="qr-box">
+            ${qr}
+            <span style="font-size:9px;font-weight:700;color:var(--muted);margin-top:2px">QR-VERIFIED</span>
+          </div>
+        </div>
+
+        <h4 style="margin:0 0 8px">${t("Врачебная комиссия", "Дәрігерлік комиссия")} (${prof.clause})</h4>
+        <div class="doc-grid">
+          ${docs.map((d) => `
+            <div class="doc-item">
+              <span>${esc(d)}</span>
+              ${isFit ? `<span class="badge fit">${t("Патологий нет", "Патология жоқ")}</span>`
+                      : isUnfit ? `<span class="badge unfit">${t("Противопоказание", "Қарсы көрсетілім")}</span>`
+                                : `<span class="badge scheduled">${t("По графику", "Кесте бойынша")}</span>`}
+            </div>`).join("")}
+        </div>
+
+        <h4 style="margin:16px 0 8px">${t("Лабораторные и функциональные исследования", "Зертханалық және функционалдық зерттеулер")}</h4>
+        <div class="doc-grid">
+          ${tests.map((ts) => `
+            <div class="doc-item">
+              <span>${esc(ts)}</span>
+              <b style="color:${isFit ? "var(--ok)" : "var(--muted)"}">${isFit ? "✓ Норма" : "—"}</b>
+            </div>`).join("")}
+        </div>
+
+        <div style="margin-top:18px;padding:16px;background:var(--bg);border-radius:14px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+          <div style="max-width:480px">
+            <div class="muted small">${t("Итоговое медицинское заключение профпатолога", "Профпатологтың қорытынды медициналық шешімі")}</div>
+            <b style="font-size:16px">${esc(emp.conclusion || (isFit ? t("Годен к работе в указанных производственных условиях без ограничений.", "Көрсетілген өндірістік жағдайларда шектеусіз жұмысқа жарамды.") : t("Осмотр в процессе прохождения.", "Тексеру өту барысында.")))}</b>
+            <div class="muted small" style="margin-top:4px">${t("AI-индекс здоровья:", "AI денсаулық индексі:")} <b style="color:var(--brand-700)">${isFit ? "94/100 (Низкий проф. риск)" : "Ожидает данных"}</b></div>
+          </div>
+          ${isFit ? `<div class="stamp-seal"><span>MedTekser Verified</span><b style="font-size:12px;margin:3px 0">${t("ГОДЕН", "ЖАРАМДЫ")}</b><span>ЭЦП / QR</span></div>` : ""}
+        </div>
+      </div>
+      <div class="modal-foot">
+        <span class="muted small">${t("Документ сформирован автоматически в соответствии с Приказом МЗ РК № ҚР ДСМ-131/2020", "Құжат ҚР ДСМ № 131/2020 бұйрығына сәйкес автоматты түрде жасалды")}</span>
+        <div class="flex">
+          <button class="btn ghost sm" onclick="closeAnyModal()">${t("Закрыть", "Жабу")}</button>
+          <button class="btn sm" onclick="window.print()">${icon("printer", 16)} ${t("Печать паспорта (075/у)", "Паспортты басып шығару")}</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(wrap);
+}
+
+// Ресми Коммерциялық Ұсыныс / Шот на оплату / Қорытынды Акт генераторы
+function openOfficialDocModal(type, data) {
+  closeAnyModal();
+  const docNo = `MT-${new Date().getFullYear()}-${String(data.id || 101).padStart(4, "0")}`;
+  const qr = svgQrCode(docNo + "|" + (data.company || "") + "|" + (data.price?.total || 0), 80);
+  const isAct = type === "act";
+  const title = isAct
+    ? t("ЗАКЛЮЧИТЕЛЬНЫЙ АКТ МЕДИЦИНСКОЙ КОМИССИИ", "МЕДИЦИНАЛЫҚ КОМИССИЯНЫҢ ҚОРЫТЫНДЫ АКТІСІ")
+    : t("КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ И СЧЁТ НА ОПЛАТУ", "КОММЕРЦИЯЛЫҚ ҰСЫНЫС ЖӘНЕ ТӨЛЕМ ШОТЫ");
+
+  const wrap = document.createElement("div");
+  wrap.className = "modal-backdrop";
+  wrap.addEventListener("click", (e) => { if (e.target === wrap) closeAnyModal(); });
+  wrap.innerHTML = `
+    <div class="modal-box">
+      <div class="modal-head">
+        <div>
+          <span class="muted small">MedTekser Document Engine · № ${docNo}</span>
+          <h3>${title}</h3>
+        </div>
+        <button class="icon-btn" onclick="closeAnyModal()">${icon("x", 18)}</button>
+      </div>
+      <div class="modal-body">
+        <div class="medpass-top">
+          <div>
+            <div style="font-weight:800;font-size:18px;color:var(--brand-800)">ТОО «MedTekser Digital Health» · г. Шымкент</div>
+            <div class="small muted">${t("БИН: 240540019283 · ИИК: KZ48722S000019283746 в АО «Kaspi Bank» · КБе 17", "БСН: 240540019283 · ЖСК: KZ48722S000019283746 «Kaspi Bank» АҚ · КБе 17")}</div>
+            <div style="margin-top:8px;font-size:14.5px">
+              <b>${t("Заказчик:", "Тапсырыс беруші:")}</b> ${esc(data.company || "Корпоративный клиент")} ${data.bin ? `(${t("БИН", "БСН")} ${esc(data.bin)})` : ""}<br/>
+              <b>${t("Вид услуги:", "Қызмет түрі:")}</b> ${esc(examName(data))}
+            </div>
+          </div>
+          <div class="qr-box">${qr}</div>
+        </div>
+
+        ${isAct ? `
+          <p class="small">${t(
+            "Настоящий Заключительный акт составлен врачебной комиссией по результатам обязательного медицинского осмотра работников предприятия в соответствии с Приказом МЗ РК № ҚР ДСМ-131/2020.",
+            "Осы Қорытынды акт ҚР ДСМ № 131/2020 бұйрығына сәйкес кәсіпорын қызметкерлерін міндетті медициналық тексеру нәтижелері бойынша жасалды."
+          )}</p>
+          <div class="doc-grid">
+            <div class="doc-item"><span>${t("Подлежало осмотру:", "Тексеруге жататыны:")}</span><b>${data.employees_count} ${t("чел.", "адам")}</b></div>
+            <div class="doc-item"><span>${t("Фактически осмотрено:", "Нақты тексерілгені:")}</span><b>${(data.progress?.fit || 0) + (data.progress?.unfit || 0)} ${t("чел.", "адам")}</b></div>
+            <div class="doc-item"><span>${t("Признаны годными:", "Жарамды деп танылды:")}</span><b style="color:var(--ok)">${data.progress?.fit || 0} ${t("чел.", "адам")}</b></div>
+            <div class="doc-item"><span>${t("Выявлены противопоказания:", "Қарсы көрсетілім анықталды:")}</span><b style="color:var(--bad)">${data.progress?.unfit || 0} ${t("чел.", "адам")}</b></div>
+          </div>
+        ` : `
+          <table style="margin:12px 0;border:1px solid var(--line)">
+            <thead>
+              <tr>
+                <th>${t("Наименование услуги", "Қызмет атауы")}</th>
+                <th>${t("Кол-во", "Саны")}</th>
+                <th>${t("Цена за 1 чел.", "1 адамға бағасы")}</th>
+                <th>${t("Сумма", "Сомасы")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>${esc(examName(data))}</b><div class="muted small">${t("Проведение медкомиссии, лабораторные анализы, ЭКГ, флюорография", "Медкомиссия, зертханалық талдаулар, ЭКГ, флюорография")}</div></td>
+                <td>${data.employees_count}</td>
+                <td>${fmtMoney(data.price?.per_employee || 15000)}</td>
+                <td><b>${fmtMoney(data.price?.subtotal || 0)}</b></td>
+              </tr>
+              <tr>
+                <td><b>${t("Цифровое сопровождение MedTekser (10%)", "MedTekser цифрлық сүйемелдеуі (10%)")}</b><div class="muted small">${t("Личный кабинет HR, электронные паспорта 075/у, сводный акт", "HR жеке кабинеті, 075/е электронды паспорттар, қорытынды акт")}</div></td>
+                <td>1</td>
+                <td>—</td>
+                <td><b>${fmtMoney(data.price?.service_fee || 0)}</b></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="text-align:right;font-size:22px;font-weight:800;color:var(--brand-800);margin-top:12px">
+            ${t("ИТОГО К ОПЛАТЕ:", "БАРЛЫҒЫ ТӨЛЕУГЕ:")} ${fmtMoney(data.price?.total || 0)}
+          </div>
+        `}
+
+        <div style="margin-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
+          <div class="small muted">
+            <b>${t("Оператор платформы:", "Платформа операторы:")}</b> MedTekser · Шымкент<br/>
+            <b>${t("Телефон / WhatsApp:", "Телефон / WhatsApp:")}</b> +7 (778) 796-12-19
+          </div>
+          <div class="stamp-seal"><span>MedTekser KZ</span><b style="font-size:11px;margin:3px 0">${isAct ? t("АКТ УТВЕРЖДЁН", "АКТ БЕКІТІЛДІ") : t("ДЛЯ ОПЛАТЫ", "ТӨЛЕМ ҮШІН")}</b><span>№ ${docNo}</span></div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <span class="muted small">${t("Нажмите «Печать / Сохранить PDF», чтобы скачать официальный бланк", "Ресми бланкті жүктеу үшін «Басып шығару / PDF сақтау» басыңыз")}</span>
+        <div class="flex">
+          <button class="btn ghost sm" onclick="closeAnyModal()">${t("Закрыть", "Жабу")}</button>
+          <button class="btn sm" onclick="window.print()">${icon("printer", 16)} ${t("Печать / Сохранить PDF", "Басып шығару / PDF сақтау")}</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(wrap);
+}
+
+// Қызметкердің Маршруттық парағы / «Жасыл дәліз» электронды талоны
+function openRouteSheetModal(emp, req) {
+  closeAnyModal();
+  const ticketNo = `GC-${String(req?.id || 1).padStart(2, "0")}-${String(emp?.id || 1).padStart(3, "0")}`;
+  const clinicName = req?.clinic?.name || "ТОО «Shymkent MedCenter Pro»";
+  const clinicAddr = req?.clinic?.address || "г. Шымкент, пр. Тауке хана, 45";
+  const schedDate = req?.scheduled_date || "2026-03-18";
+  const qr = svgQrCode(`MEDTEKSER-TICKET|${ticketNo}|${emp?.iin || ""}|${clinicName}`, 88);
+
+  const waMsg = encodeURIComponent(
+    t(
+      `Здравствуйте, ${emp?.full_name || ""}! Вы записаны на корпоративный медосмотр через платформу MedTekser (Зелёный коридор без очереди).\n📅 Дата: ${schedDate} (08:30–10:30)\n🏥 Клиника: ${clinicName} (${clinicAddr})\n🎫 Талон: ${ticketNo}\nПри себе иметь удостоверение личности.`,
+      `Сәлеметсіз бе, ${emp?.full_name || ""}! Сіз MedTekser платформасы арқылы кезексіз корпоративтік медтексеруге жазылдыңыз.\n📅 Күні: ${schedDate} (08:30–10:30)\n🏥 Клиника: ${clinicName} (${clinicAddr})\n🎫 Талон: ${ticketNo}\nӨзіңізбен жеке куәлік ала келіңіз.`
+    )
+  );
+
+  const wrap = document.createElement("div");
+  wrap.className = "modal-backdrop";
+  wrap.addEventListener("click", (e) => { if (e.target === wrap) closeAnyModal(); });
+  wrap.innerHTML = `
+    <div class="modal-box">
+      <div class="modal-head">
+        <div class="flex">
+          <span class="badge scheduled">🎫 ${t("ЗЕЛЁНЫЙ КОРИДОР · ТАЛОН", "ЖАСЫЛ ДӘЛІЗ · ТАЛОН")} № ${ticketNo}</span>
+          <h3>${t("Маршрутный лист медосмотра (45 минут)", "Медтексерудің маршруттық парағы (45 минут)")}</h3>
+        </div>
+        <button class="icon-btn" onclick="closeAnyModal()">${icon("x", 18)}</button>
+      </div>
+      <div class="modal-body">
+        <div class="medpass-top">
+          <div>
+            <div style="font-size:19px;font-weight:800;margin-bottom:4px">${esc(emp?.full_name || "Әбдірахманов Нұрлан Серікұлы")}</div>
+            <div class="small muted">${t("ИИН:", "ЖСН:")} <b>${esc(emp?.iin || "900315300145")}</b> · ${t("Должность:", "Лауазымы:")} <b>${esc(emp?.position || "Специалист")}</b></div>
+            <div class="small" style="margin-top:6px">
+              <b>${t("Предприятие:", "Кәсіпорын:")}</b> ${esc(req?.company || "ЖШС «Ontustik Qurylys Group»")}<br/>
+              <b>${t("Медцентр:", "Медорталық:")}</b> ${esc(clinicName)} (${esc(clinicAddr)})<br/>
+              <b>${t("Дата и время VIP-окна:", "VIP-уақыт терезесі:")}</b> <span style="color:var(--brand-700);font-weight:800">${esc(schedDate)} · 08:30 – 09:30</span>
+            </div>
+          </div>
+          <div class="qr-box">
+            ${qr}
+            <div style="font-size:9px;font-weight:700;color:var(--muted);margin-top:2px">FAST-TRACK QR</div>
+          </div>
+        </div>
+
+        <div class="small muted" style="font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">
+          ${t("Пошаговый маршрут по кабинетам (без общей очереди):", "Кабинеттер бойынша кезексіз маршрут:")}
+        </div>
+        <div class="route-steps">
+          <div class="route-step">
+            <span class="route-room">Каб. 101</span>
+            <div><b>${t("Стойка MedTekser Fast-Track (Регистратура B2B)", "MedTekser Fast-Track тіркеу орны")}</b><div class="muted small">${t("Сканирование QR-талона по удостоверению личности", "Жеке куәлік пен QR-талонды сканерлеу")}</div></div>
+            <span class="badge confirmed">08:30 (3 мин)</span>
+          </div>
+          <div class="route-step">
+            <span class="route-room">Каб. 104</span>
+            <div><b>${t("Процедурный кабинет + ЭКГ", "Емшара кабинеті + ЭКГ")}</b><div class="muted small">${t("Забор крови (ОАК, биохимия), ОАМ, электрокардиография", "Қан тапсыру, ЖҚТ, электрокардиография")}</div></div>
+            <span class="badge confirmed">08:35 (12 мин)</span>
+          </div>
+          <div class="route-step">
+            <span class="route-room">Каб. 108</span>
+            <div><b>${t("Цифровая флюорография и Аудиометрия / Спирометрия", "Цифрлық флюорография және Аудиометрия")}</b><div class="muted small">${t("Мгновенный снимок грудной клетки в 2 проекциях", "Кеуде қуысының лездік цифрлық рентгені")}</div></div>
+            <span class="badge confirmed">08:50 (10 мин)</span>
+          </div>
+          <div class="route-step">
+            <span class="route-room">Каб. 204</span>
+            <div><b>${t("Врачебная комиссия + Заключение Профпатолога", "Дәрігерлік комиссия + Кәсіптік патолог қорытындысы")}</b><div class="muted small">${t("Терапевт, Невропатолог, Офтальмолог, ЛОР, Хирург → Выпуск QR 075/у", "Мамандар тексеруі → QR 075/у паспортын шығару")}</div></div>
+            <span class="badge fit">09:00 (20 мин)</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <a class="btn ghost sm" target="_blank" rel="noopener" href="https://wa.me/77787961219?text=${waMsg}">
+          ${icon("whatsapp", 16)} ${t("Отправить талон в WhatsApp", "Талонды WhatsApp-қа жіберу")}
+        </a>
+        <div class="flex">
+          <button class="btn ghost sm" onclick="closeAnyModal()">${t("Закрыть", "Жабу")}</button>
+          <button class="btn sm" onclick="window.print()">${icon("printer", 16)} ${t("Распечатать талон", "Талонды басып шығару")}</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(wrap);
+}
+
+// Серіктес клиникалардың кеңейтілген деректері (Шымкент)
+const CLINICS_EXTRA = {
+  1: {
+    district_ru: "Әл-Фараби р-н",
+    district_kk: "Әл-Фараби ауд.",
+    rating: "4.9 ★ (340+ B2B)",
+    capacity_ru: "До 70 чел. / день",
+    capacity_kk: "Күніне 70 адамға дейін",
+    mobile: true,
+    equip_ru: ["Цифровой рентген", "Аудиокамера", "Спирометрия", "Своя бак. лаборатория", "ЭКГ 12-кан."],
+    equip_kk: ["Цифрлық рентген", "Аудиокамера", "Спирометрия", "Өз бак. зертханасы", "12-арналы ЭКГ"],
+    slots: ["08:30", "10:00", "14:00"],
+  },
+  2: {
+    district_ru: "Еңбекші р-н",
+    district_kk: "Еңбекші ауд.",
+    rating: "4.8 ★ (215+ B2B)",
+    capacity_ru: "До 55 чел. / день",
+    capacity_kk: "Күніне 55 адамға дейін",
+    mobile: true,
+    equip_ru: ["Передвижной флюорограф", "Выездная бригада", "Нарко-тест панель", "Вестибулометрия"],
+    equip_kk: ["Жылжымалы флюорограф", "Көшпелі бригада", "Нарко-тест панель", "Вестибулометрия"],
+    slots: ["09:00", "11:30", "15:00"],
+  },
+  3: {
+    district_ru: "Тұран / Абай р-н",
+    district_kk: "Тұран / Абай ауд.",
+    rating: "4.9 ★ (190+ B2B)",
+    capacity_ru: "До 50 чел. / день",
+    capacity_kk: "Күніне 50 адамға дейін",
+    mobile: false,
+    equip_ru: ["Экспресс Санкнижка", "ПЦР / Бак. посев", "Дерматоскопия", "УЗИ / ЭКГ"],
+    equip_kk: ["Экспресс Санкітапша", "ПТР / Бак. егу", "Дерматоскопия", "УДЗ / ЭКГ"],
+    slots: ["08:00", "09:30", "13:30", "16:00"],
+  },
+};
+
+// Қараңғы / Жарық тақырып ауыстырғышы (Dark / Light Mode)
+function getTheme() {
+  try { return localStorage.getItem("medtekser_theme") || "light"; } catch (_) { return "light"; }
+}
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  document.querySelectorAll(".theme-btn").forEach((btn) => {
+    btn.innerHTML = theme === "dark" ? "☀️" : "🌙";
+    btn.title = theme === "dark" ? t("Светлая тема", "Жарық тақырып") : t("Тёмная тема", "Қараңғы тақырып");
+  });
+}
+function toggleTheme() {
+  const next = getTheme() === "dark" ? "light" : "dark";
+  try { localStorage.setItem("medtekser_theme", next); } catch (_) {}
+  applyTheme(next);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-logo]").forEach((el) => (el.innerHTML = LOGO_HTML));
   document.querySelectorAll("[data-icon]").forEach((el) => {
     el.innerHTML = icon(el.dataset.icon, +el.dataset.size || 20) + el.innerHTML;
   });
+  // Inject theme toggle button right next to every .lang-switch if not already present
+  document.querySelectorAll(".lang-switch").forEach((sw) => {
+    if (!sw.parentElement.querySelector(".theme-btn")) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "theme-btn";
+      btn.onclick = toggleTheme;
+      sw.insertAdjacentElement("afterend", btn);
+    }
+  });
+  applyTheme(getTheme());
   applyTranslations();
 });
