@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Личный кабинет HR — MedTekser</title>
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#041d1a" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23088471'/%3E%3Cpath d='M8 17h4l2-5 4 9 2-4h4' stroke='white' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="app-body">
+  <!-- ============ КІРУ ============ -->
+  <div class="auth-screen" id="login-screen">
+    <form class="auth-card" id="login">
+      <div class="auth-top">
+        <a href="/" class="logo" data-logo></a>
+        <div data-lang-switch></div>
+      </div>
+      <h1 data-ru="Кабинет работодателя" data-kk="Жұмыс беруші кабинеті">Кабинет работодателя</h1>
+      <p class="sub" data-ru="Введите номер заявки и код доступа (демо: № 1, код DEMO12)" data-kk="Өтінім нөмірі мен кіру кодын енгізіңіз (демо: № 1, код DEMO12)">Введите номер заявки и код доступа (демо: № 1, код DEMO12)</p>
+      <div class="field">
+        <label for="l-id" data-ru="Номер заявки" data-kk="Өтінім нөмірі">Номер заявки</label>
+        <input id="l-id" name="request_id" type="number" inputmode="numeric" data-ph-ru="Например: 1" data-ph-kk="Мысалы: 1" placeholder="Например: 1" required />
+      </div>
+      <div class="field">
+        <label for="l-code" data-ru="Код доступа" data-kk="Кіру коды">Код доступа</label>
+        <input id="l-code" name="code" data-ph-ru="Например: DEMO12" data-ph-kk="Мысалы: DEMO12" placeholder="Например: DEMO12" autocomplete="off" style="text-transform:uppercase;letter-spacing:.1em" required />
+      </div>
+      <div id="login-err"></div>
+      <button class="btn block" type="submit" id="login-btn" data-ru="Войти в кабинет" data-kk="Кабинетке кіру">Войти в кабинет</button>
+      <p class="muted small center" style="margin:18px 0 0">
+        <span data-ru="Ещё нет заявки?" data-kk="Өтінім әлі жоқ па?">Ещё нет заявки?</span>
+        <a href="/#order" data-ru="Оставить заявку" data-kk="Өтінім қалдыру">Оставить заявку</a>
+      </p>
+    </form>
+  </div>
+
+  <!-- ============ КАБИНЕТ ============ -->
+  <div id="cabinet" class="hidden">
+    <header class="app-header">
+      <div class="container">
+        <a href="/" class="logo" data-logo></a>
+        <div class="grow"></div>
+        <span class="muted small" id="h-company"></span>
+        <div data-lang-switch></div>
+        <button class="btn ghost sm" id="logout">
+          <span data-icon="logout" data-size="16"></span>
+          <span data-ru="Выйти" data-kk="Шығу">Выйти</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <div class="container">
+        <div class="page-title">
+          <div>
+            <div class="muted small" id="c-sub"></div>
+            <h1 id="c-company"></h1>
+            <div id="c-status"></div>
+          </div>
+          <div class="flex no-print">
+            <button class="btn ghost" onclick="window.print()">
+              <span data-icon="printer" data-size="18"></span>
+              <span data-ru="Печать сводного отчёта" data-kk="Есепті басып шығару">Печать сводного отчёта</span>
+            </button>
+            <a class="btn" id="wa-manager" target="_blank" rel="noopener" data-ru="Связь с менеджером (WhatsApp)" data-kk="Менеджерге жазу (WhatsApp)">Связь с менеджером (WhatsApp)</a>
+          </div>
+        </div>
+
+        <div class="grid g-4" style="margin-bottom:24px" id="c-cards"></div>
+
+        <div class="panel" style="margin-bottom:24px">
+          <div class="panel-head">
+            <h3 data-ru="Прогресс прохождения медосмотра" data-kk="Медициналық тексеру барысы">Прогресс прохождения медосмотра</h3>
+            <b id="c-percent"></b>
+          </div>
+          <div class="panel-body" id="c-progress"></div>
+        </div>
+
+        <div class="panel no-print" style="margin-bottom:24px" id="upload-panel">
+          <div class="panel-head">
+            <h3 data-ru="Загрузка списка сотрудников" data-kk="Қызметкерлер тізімін жүктеу">Загрузка списка сотрудников</h3>
+            <span class="muted small" data-ru="Колонки: ФИО · ИИН · Должность · Вредный фактор" data-kk="Бағандар: ТАӘ · ЖСН · Лауазымы · Зиянды фактор">Колонки: ФИО · ИИН · Должность · Вредный фактор</span>
+          </div>
+          <div class="panel-body">
+            <div class="grid g-2">
+              <label class="dropzone" id="dropzone">
+                <input type="file" id="file" accept=".csv,.txt" hidden />
+                <div class="ic" data-icon="upload" data-size="32"></div>
+                <b data-ru="Перетащите CSV-файл сюда или нажмите для выбора" data-kk="CSV файлды осында сүйреңіз немесе басыңыз">Перетащите CSV-файл сюда или нажмите для выбора</b>
+                <div class="muted small" data-ru="В Excel: Файл → Сохранить как → CSV UTF-8" data-kk="Excel-де: Файл → Басқаша сақтау → CSV UTF-8">В Excel: Файл → Сохранить как → CSV UTF-8</div>
+              </label>
+              <div>
+                <textarea id="csv" rows="5"
+                  data-ph-ru="Или скопируйте строки прямо из таблицы Excel и вставьте сюда:&#10;Сейітов Нұрлан Асқарұлы	900101300123	Электросварщик	Шум, аэрозоли&#10;Әлиева Айгүл Серікқызы	950505400456	Бухгалтер"
+                  data-ph-kk="Немесе Excel кестесінен тікелей көшіріп қойыңыз:&#10;Сейітов Нұрлан Асқарұлы	900101300123	Дәнекерлеуші	Шу, аэрозоль&#10;Әлиева Айгүл Серікқызы	950505400456	Бухгалтер"
+                  placeholder="Или скопируйте строки прямо из таблицы Excel и вставьте сюда:&#10;Сейітов Нұрлан Асқарұлы	900101300123	Электросварщик	Шум, аэрозоли"></textarea>
+              </div>
+            </div>
+            <div id="preview" class="muted small" style="margin:12px 0"></div>
+            <button class="btn" id="upload">
+              <span data-icon="upload" data-size="18"></span>
+              <span data-ru="Добавить сотрудников в список" data-kk="Қызметкерлерді тізімге қосу">Добавить сотрудников в список</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3>
+              <span data-ru="Список сотрудников" data-kk="Қызметкерлер тізімі">Список сотрудников</span>
+              <span class="muted" id="emp-count"></span>
+            </h3>
+            <div class="flex no-print">
+              <select id="emp-filter" style="width:auto"></select>
+              <div class="search">
+                <span data-icon="search" data-size="16"></span>
+                <input id="emp-search" data-ph-ru="Поиск по ФИО или ИИН…" data-ph-kk="Аты-жөні немесе ЖСН бойынша іздеу…" placeholder="Поиск по ФИО или ИИН…" />
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th data-ru="Сотрудник / Должность" data-kk="Қызметкер / Лауазымы">Сотрудник / Должность</th>
+                  <th data-ru="ИИН" data-kk="ЖСН">ИИН</th>
+                  <th data-ru="Вредный фактор" data-kk="Зиянды фактор">Вредный фактор</th>
+                  <th data-ru="Статус" data-kk="Мәртебе">Статус</th>
+                  <th data-ru="Заключение врача" data-kk="Дәрігер қорытындысы">Заключение врача</th>
+                  <th class="no-print"></th>
+                </tr>
+              </thead>
+              <tbody id="emp-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/common.js"></script>
+  <script>
+    let token = localStorage.getItem("company_token");
+    let DATA = null;
+    let CONTACT = "+77787961219";
+    const $ = (id) => document.getElementById(id);
+
+    function populateFilter() {
+      const cur = $("emp-filter").value;
+      const statuses = ["pending", "scheduled", "fit", "unfit", "absent"];
+      $("emp-filter").innerHTML = `<option value="">${t("Все статусы", "Барлық мәртебе")}</option>` +
+        statuses.map((s) => `<option value="${s}" ${s === cur ? "selected" : ""}>${statusLabel(s)}</option>`).join("");
+    }
+
+    api("/api/config").then((c) => { if (c.contact_phone) CONTACT = c.contact_phone; }).catch(() => {});
+
+    async function login(request_id, code) {
+      const btn = $("login-btn");
+      setBusy(btn, true, t("Проверка…", "Тексерілуде…"));
+      try {
+        const r = await api("/api/cabinet/login", { method: "POST", body: { request_id, code } });
+        token = r.token;
+        localStorage.setItem("company_token", token);
+        history.replaceState(null, "", "/cabinet");
+        await load();
+      } catch (e) {
+        $("login-err").innerHTML = `<div class="alert err">${esc(e.message)}</div>`;
+      } finally {
+        setBusy(btn, false);
+      }
+    }
+
+    function showLogin() {
+      localStorage.removeItem("company_token");
+      token = null;
+      $("login-screen").classList.remove("hidden");
+      $("cabinet").classList.add("hidden");
+    }
+
+    async function load() {
+      try {
+        DATA = await api("/api/cabinet", { token });
+      } catch (e) {
+        if (e.status === 401 || e.status === 404) return showLogin();
+        return toast(e.message, "err");
+      }
+      $("login-screen").classList.add("hidden");
+      $("cabinet").classList.remove("hidden");
+      populateFilter();
+      render();
+    }
+
+    function render() {
+      if (!DATA) return;
+      const d = DATA;
+      $("h-company").textContent = d.company;
+      $("c-company").textContent = d.company;
+      $("c-sub").textContent = `${t("Заявка", "Өтінім")} #${d.id} · ${fmtDate(d.created_at)}`;
+      $("c-status").innerHTML = `${badge(d.status)} <span class="muted small" style="margin-left:6px">${esc(examName(d))}</span>`;
+
+      $("wa-manager").href = waLink(
+        CONTACT,
+        t(`Здравствуйте! Вопрос по заявке №${d.id} (${d.company}).`, `Сәлеметсіз бе! №${d.id} (${d.company}) өтінімі бойынша сұрақ.`)
+      );
+
+      const clinic = d.clinic
+        ? `<div class="value" style="font-size:17px">${esc(d.clinic.name)}</div><div class="hint">${esc(d.clinic.address || "")}</div>`
+        : `<div class="value" style="font-size:17px">${t("Назначается", "Таңдалуда")}</div><div class="hint">${t("Менеджер закрепит клинику", "Менеджер жақын арада бекітеді")}</div>`;
+
+      $("c-cards").innerHTML = `
+        <div class="stat"><span class="s-ic">${icon("hospital")}</span><div class="label">${t("Клиника / Бригада", "Клиника / Бригада")}</div>${clinic}</div>
+        <div class="stat"><span class="s-ic violet">${icon("calendar")}</span><div class="label">${t("Дата осмотра", "Тексеру күні")}</div>
+          <div class="value" style="font-size:20px">${d.scheduled_date ? fmtDate(d.scheduled_date) : t("Согласуется", "Келісілуде")}</div>
+          <div class="hint">${d.scheduled_date ? t("Дата подтверждена", "Расталған күн") : d.preferred_date ? t("Желаемая: ", "Қалаған: ") + fmtDate(d.preferred_date) : t("Ожидает согласования", "Келісілуде")}</div></div>
+        <div class="stat"><span class="s-ic amber">${icon("users")}</span><div class="label">${t("Сотрудники", "Қызметкерлер")}</div>
+          <div class="value">${d.employees_loaded}<span class="muted" style="font-size:16px;font-weight:600"> / ${d.employees_count}</span></div><div class="hint">${t("загружено в список", "тізімге жүктелді")}</div></div>
+        <div class="stat"><span class="s-ic coral">${icon("wallet")}</span><div class="label">${t("Итоговая сумма", "Жалпы құны")}</div>
+          <div class="value">${fmtMoney(d.price.total)}</div><div class="hint">${t("включая сервис ", "сервис қоса ")}${fmtMoney(d.price.service_fee)}</div></div>`;
+
+      const p = d.progress, total = d.employees_loaded;
+      const done = p.fit + p.unfit;
+      $("c-percent").textContent = total ? Math.round((100 * done) / total) + "%" : "";
+      $("c-progress").innerHTML = total
+        ? `${progressBar(p, total)}${progressLegend(p)}`
+        : `<div class="muted">${t("Загрузите список сотрудников ниже, чтобы отслеживать прохождение осмотра.", "Тексеру барысын көру үшін төменде қызметкерлер тізімін жүктеңіз.")}</div>`;
+
+      $("upload-panel").classList.toggle("hidden", ["done", "cancelled"].includes(d.status));
+      renderEmployees();
+    }
+
+    function renderEmployees() {
+      if (!DATA) return;
+      const q = $("emp-search").value.trim().toLowerCase();
+      const f = $("emp-filter").value;
+      const list = DATA.employees.filter((e) =>
+        (!f || e.status === f) && (!q || e.full_name.toLowerCase().includes(q) || (e.iin || "").includes(q)));
+      $("emp-count").textContent = `(${DATA.employees.length})`;
+      if (!DATA.employees.length) {
+        $("emp-body").innerHTML = `<tr><td colspan="7"><div class="empty"><div class="ic">📋</div><b>${t("Список сотрудников пока пуст", "Тізім әлі жүктелмеген")}</b><div>${t("Добавьте сотрудников через форму загрузки выше", "Жоғарыдағы форма арқылы қызметкерлер тізімін қосыңыз")}</div></div></td></tr>`;
+        return;
+      }
+      $("emp-body").innerHTML = list.length ? list.map((e, i) => `
+        <tr>
+          <td class="muted">${i + 1}</td>
+          <td><div class="flex" style="gap:10px;flex-wrap:nowrap"><span class="avatar" style="background:${avatarColor(e.full_name)}">${esc(initials(e.full_name))}</span>
+            <div><b>${esc(e.full_name)}</b><div class="muted small">${esc(e.position || "—")}</div></div></div></td>
+          <td class="small">${esc(e.iin || "—")}</td>
+          <td class="small">${esc(e.harmful_factor || "—")}</td>
+          <td>${badge(e.status)}</td>
+          <td class="small">${esc(e.conclusion || "—")}</td>
+          <td class="no-print">${e.status === "pending" ? `<button class="icon-btn" title="${t("Удалить", "Өшіру")}" onclick="delEmp(${e.id})">${icon("x", 16)}</button>` : ""}</td>
+        </tr>`).join("")
+        : `<tr><td colspan="7" class="empty">${t("По вашему запросу ничего не найдено", "Ештеңе табылмады")}</td></tr>`;
+    }
+
+    window.onLangChange = () => {
+      populateFilter();
+      if (DATA) render();
+    };
+
+    async function delEmp(id) {
+      if (!confirm(t("Удалить сотрудника из списка?", "Қызметкерді тізімнен өшіресіз бе?"))) return;
+      try {
+        await api("/api/cabinet/employees/" + id, { method: "DELETE", token });
+        toast(t("Удалено", "Өшірілді"));
+        load();
+      } catch (e) { toast(e.message, "err"); }
+    }
+
+    function readFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => { $("csv").value = reader.result; updatePreview(); };
+      reader.readAsText(file, "utf-8");
+    }
+    function updatePreview() {
+      const lines = $("csv").value.trim().split(/\r?\n/).filter((l) => l.trim());
+      $("preview").textContent = lines.length ? t(`Готово к загрузке строк: ${lines.length}`, `Жүктеуге дайын жол саны: ${lines.length}`) : "";
+    }
+    $("file").addEventListener("change", (e) => readFile(e.target.files[0]));
+    const dz = $("dropzone");
+    ["dragenter", "dragover"].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.add("drag"); }));
+    ["dragleave", "drop"].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.remove("drag"); }));
+    dz.addEventListener("drop", (e) => readFile(e.dataTransfer.files[0]));
+    $("csv").addEventListener("input", updatePreview);
+
+    $("upload").addEventListener("click", async () => {
+      const csv = $("csv").value.trim();
+      if (!csv) return toast(t("Сначала вставьте список или выберите CSV-файл", "Алдымен тізімді қосыңыз"), "err");
+      const btn = $("upload");
+      setBusy(btn, true, t("Загрузка…", "Жүктелуде…"));
+      try {
+        const r = await api("/api/cabinet/employees", { method: "POST", body: { csv }, token });
+        toast(t(`Добавлено сотрудников: ${r.added}`, `${r.added} қызметкер қосылды`));
+        $("csv").value = ""; $("file").value = ""; updatePreview();
+        await load();
+      } catch (e) {
+        toast(e.message, "err");
+      } finally {
+        setBusy(btn, false);
+      }
+    });
+
+    $("emp-search").addEventListener("input", renderEmployees);
+    $("emp-filter").addEventListener("change", renderEmployees);
+
+    $("login").addEventListener("submit", (e) => {
+      e.preventDefault();
+      login(e.target.request_id.value, e.target.code.value);
+    });
+
+    $("logout").addEventListener("click", async () => {
+      await api("/api/logout", { method: "POST", token }).catch(() => {});
+      showLogin();
+    });
+
+    populateFilter();
+    const qs = new URLSearchParams(location.search);
+    if (qs.get("id")) $("l-id").value = qs.get("id");
+    if (qs.get("id") && qs.get("code")) login(qs.get("id"), qs.get("code"));
+    else if (token) load();
+  </script>
+</body>
+</html>
