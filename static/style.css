@@ -657,11 +657,16 @@ td select { padding-right: 30px; background-position: right 10px center; }
   border-bottom-color: var(--line);
 }
 [data-theme="dark"] .section.alt { background: #091917; }
+[data-theme="dark"] .section.white { background: #071614; border-color: var(--line); }
 [data-theme="dark"] .card,
 [data-theme="dark"] .price-card,
 [data-theme="dark"] .clinic-card,
 [data-theme="dark"] .panel,
 [data-theme="dark"] .stat,
+[data-theme="dark"] .step,
+[data-theme="dark"] .faq details,
+[data-theme="dark"] .chip span,
+[data-theme="dark"] .auth-card,
 [data-theme="dark"] .faq-item,
 [data-theme="dark"] .calc-form,
 [data-theme="dark"] .ai-result-card,
@@ -671,6 +676,10 @@ td select { padding-right: 30px; background-position: right 10px center; }
   border-color: #193c36;
   color: var(--ink);
 }
+[data-theme="dark"] .card.before { background: rgba(225, 29, 72, .08); border-color: rgba(225, 29, 72, .3); }
+[data-theme="dark"] .card.after { background: rgba(16, 185, 129, .1); border-color: rgba(16, 185, 129, .38); }
+[data-theme="dark"] .lang-switch { background: #091b18; border-color: #1f4740; }
+[data-theme="dark"] .lang-btn.active { background: var(--brand-600); color: #fff; }
 [data-theme="dark"] .modal-head,
 [data-theme="dark"] .modal-foot,
 [data-theme="dark"] .table th,
@@ -813,6 +822,11 @@ td select { padding-right: 30px; background-position: right 10px center; }
 .metric-card {
   background: var(--white); border: 1px solid var(--line); border-radius: 20px;
   padding: 24px; position: relative; overflow: hidden; box-shadow: var(--shadow-xs);
+  transition: transform .25s cubic-bezier(.2, .8, .2, 1), box-shadow .25s;
+}
+.metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -8px rgba(14, 165, 142, .22);
 }
 .metric-card .big-num {
   font-size: 32px; font-weight: 800; color: var(--brand-700); letter-spacing: -.03em; margin: 6px 0;
@@ -825,6 +839,331 @@ td select { padding-right: 30px; background-position: right 10px center; }
 [data-theme="dark"] .route-step {
   background: #091816; border-color: #1c423c;
 }
+
+/* =========================================================
+   🔥 ЭКШН-ЭФФЕКТТЕР, КИБЕР-НЕОН ЖӘНЕ ДИНАМИКАЛЫҚ ЖАРҚЫРАУ (WOW)
+   ========================================================= */
+/* Басты экрандағы неон аурасы мен импульстік анимация */
+.hero {
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(94, 234, 212, .24) 0%, rgba(37, 201, 176, .08) 50%, transparent 75%);
+  filter: blur(60px);
+  pointer-events: none;
+  animation: pulseAura 8s ease-in-out infinite alternate;
+}
+@keyframes pulseAura {
+  0% { transform: translateX(-50%) scale(.9); opacity: .6; }
+  100% { transform: translateX(-50%) scale(1.15); opacity: 1; }
+}
+
+/* Экшн батырмалардың жарық жүгіру эффектісі (Shimmer Glow) */
+.btn.coral,
+.btn.pulse-action {
+  position: relative;
+  overflow: hidden;
+}
+.btn.coral::after,
+.btn.pulse-action::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .35), transparent);
+  transform: rotate(30deg);
+  animation: buttonShine 3.5s ease-in-out infinite;
+}
+@keyframes buttonShine {
+  0% { left: -70%; }
+  35%, 100% { left: 150%; }
+}
+
+/* Карточкаларға 3D тереңдік пен жарық жүгірту */
+.card.hover,
+.price-card,
+.clinic-card {
+  transition: transform .22s cubic-bezier(.2, .8, .2, 1), box-shadow .22s, border-color .22s;
+}
+.card.hover:hover,
+.price-card:hover,
+.clinic-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--brand-400);
+  box-shadow: 0 20px 40px -12px rgba(8, 132, 113, .22), 0 0 0 1px var(--brand-400);
+}
+
+/* AI-Анализатор секциясындағы неон рамка */
+.ai-panel {
+  box-shadow: 0 0 35px -8px rgba(94, 234, 212, .2);
+  border: 1px solid rgba(94, 234, 212, .32);
+}
+
+/* Тірі пульс маркері (Live Radar) */
+.pulse-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, .7);
+  animation: livePulse 2s infinite;
+}
+@keyframes livePulse {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, .7); }
+  70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* =========================================================
+   🫀 КИБЕР-МЕДИЦИНАЛЫҚ AI-ТЕРМИНАЛ, ТІРІ ЭКГ ЖӘНЕ LLM КОНСИЛИУМ
+   ========================================================= */
+.biomed-section {
+  background:
+    radial-gradient(950px 500px at 10% 10%, rgba(16, 185, 129, .18), transparent 65%),
+    radial-gradient(900px 500px at 90% 90%, rgba(14, 165, 233, .16), transparent 65%),
+    linear-gradient(170deg, #031311 0%, #06211e 50%, #031513 100%);
+  color: #ecfdf5;
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid rgba(94, 234, 212, .22);
+  border-bottom: 1px solid rgba(94, 234, 212, .22);
+}
+.biomed-section h2, .biomed-section h3, .biomed-section h4 { color: #fff; }
+
+.biomed-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1.15fr;
+  gap: 26px;
+  align-items: stretch;
+}
+@media (max-width: 980px) { .biomed-grid { grid-template-columns: 1fr; } }
+
+.cyber-card {
+  background: rgba(7, 28, 25, .82);
+  border: 1px solid rgba(94, 234, 212, .28);
+  border-radius: 22px;
+  padding: 26px;
+  box-shadow: 0 24px 60px -15px rgba(0, 0, 0, .65), inset 0 1px 0 rgba(255, 255, 255, .1);
+  backdrop-filter: blur(16px);
+  position: relative;
+  overflow: hidden;
+}
+.cyber-card.alert-warn {
+  border-color: rgba(245, 158, 11, .65);
+  box-shadow: 0 0 40px -10px rgba(245, 158, 11, .35);
+}
+.cyber-card.alert-crit {
+  border-color: rgba(244, 63, 94, .8);
+  box-shadow: 0 0 50px -8px rgba(244, 63, 94, .45);
+}
+
+/* Тірі ЭКГ экраны (Oscilloscope) */
+.ecg-screen {
+  background: #020c0b;
+  border: 1px solid rgba(52, 211, 153, .35);
+  border-radius: 16px;
+  padding: 14px 16px;
+  position: relative;
+  overflow: hidden;
+  background-image:
+    linear-gradient(rgba(16, 185, 129, .08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, .08) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.ecg-trace-wrap {
+  height: 86px;
+  position: relative;
+  overflow: hidden;
+}
+.ecg-svg {
+  width: 200%;
+  height: 86px;
+  animation: ecgScroll 3.2s linear infinite;
+}
+.ecg-svg.fast { animation-duration: 1.7s; }
+.ecg-svg.crit { animation-duration: 1.15s; }
+@keyframes ecgScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.vitals-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 14px;
+}
+@media (max-width: 600px) { .vitals-grid { grid-template-columns: repeat(2, 1fr); } }
+.vital-box {
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 13px;
+  padding: 10px 12px;
+}
+.vital-box .v-lbl { font-size: 11px; color: rgba(255, 255, 255, .62); text-transform: uppercase; letter-spacing: .05em; }
+.vital-box .v-val { font-size: 22px; font-weight: 800; letter-spacing: -.02em; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.vital-box .v-sub { font-size: 11px; color: rgba(255, 255, 255, .55); }
+
+/* Органдар сканері (Digital Twin Pills) */
+.organ-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 9px;
+  margin-top: 14px;
+}
+.organ-item {
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+}
+.organ-item.risk-high {
+  background: rgba(244, 63, 94, .14);
+  border-color: rgba(244, 63, 94, .45);
+  color: #fecdd3;
+}
+.organ-item.risk-mid {
+  background: rgba(245, 158, 11, .14);
+  border-color: rgba(245, 158, 11, .45);
+  color: #fde68a;
+}
+.organ-item.risk-ok {
+  background: rgba(16, 185, 129, .1);
+  border-color: rgba(16, 185, 129, .3);
+  color: #a7f3d0;
+}
+
+/* Автономды LLM Консилиум Терминалы */
+.llm-terminal {
+  background: #020d0c;
+  border: 1px solid rgba(94, 234, 212, .3);
+  border-radius: 16px;
+  padding: 16px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #d1fae5;
+  min-height: 220px;
+  max-height: 330px;
+  overflow-y: auto;
+  box-shadow: inset 0 2px 14px rgba(0, 0, 0, .6);
+}
+.llm-step {
+  padding: 6px 10px;
+  border-left: 2px solid #10b981;
+  margin-bottom: 8px;
+  background: rgba(16, 185, 129, .06);
+  border-radius: 0 8px 8px 0;
+  animation: fadeIn .25s ease;
+}
+.llm-verdict-box {
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  font-family: var(--font);
+  border: 1.5px solid #10b981;
+  background: rgba(16, 185, 129, .12);
+}
+.llm-verdict-box.warn {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, .14);
+}
+.llm-verdict-box.crit {
+  border-color: #f43f5e;
+  background: rgba(244, 63, 94, .16);
+}
+.case-btn {
+  text-align: left;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .15);
+  color: #ecfdf5;
+  padding: 9px 12px;
+  border-radius: 11px;
+  font: 600 12.5px/1.35 var(--font);
+  cursor: pointer;
+  transition: all .15s;
+}
+.case-btn:hover, .case-btn.active {
+  background: rgba(94, 234, 212, .18);
+  border-color: #5eead4;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* Голографиялық 3D/SVG Адам Денесінің Цифрлық Егізі (Holographic Digital Twin) */
+.holo-wrap {
+  display: grid;
+  grid-template-columns: 185px 1fr;
+  gap: 16px;
+  align-items: center;
+  margin-top: 14px;
+}
+@media (max-width: 640px) { .holo-wrap { grid-template-columns: 1fr; } }
+
+.holo-body-box {
+  position: relative;
+  height: 250px;
+  background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, .18), rgba(2, 12, 11, .92) 75%);
+  border: 1px solid rgba(94, 234, 212, .32);
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  box-shadow: inset 0 0 28px rgba(16, 185, 129, .2);
+}
+.laser-scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #5eead4, #fff, #5eead4, transparent);
+  box-shadow: 0 0 18px 3px #10b981;
+  animation: holoScan 3.4s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes holoScan {
+  0% { top: 8%; }
+  100% { top: 90%; }
+}
+
+/* 5-Агенттік Мульти-LLM Нейрожелілік Консилиум */
+.agent-swarm-bar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
+  margin-bottom: 12px;
+}
+@media (max-width: 680px) { .agent-swarm-bar { grid-template-columns: repeat(2, 1fr); } }
+.agent-node {
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid rgba(94, 234, 212, .22);
+  border-radius: 10px;
+  padding: 7px 8px;
+  text-align: center;
+  font-size: 11px;
+  transition: all .2s;
+}
+.agent-node.active {
+  background: rgba(16, 185, 129, .18);
+  border-color: #34d399;
+  box-shadow: 0 0 16px rgba(16, 185, 129, .35);
+}
+.agent-node b { display: block; color: #5eead4; font-size: 11.5px; }
 
 @media print {
   .app-header, .no-print, .sidebar, .wa-float, .site-header, .site-footer, .trust-ribbon { display: none !important; }
