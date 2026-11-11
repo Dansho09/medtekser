@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Панель оператора — MedTekser</title>
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#041d1a" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23088471'/%3E%3Cpath d='M8 17h4l2-5 4 9 2-4h4' stroke='white' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="app-body">
+  <!-- ============ КІРУ ============ -->
+  <div class="auth-screen" id="login-screen">
+    <form class="auth-card" id="login">
+      <div class="auth-top">
+        <a href="/" class="logo" data-logo></a>
+        <div data-lang-switch></div>
+      </div>
+      <h1 data-ru="Панель оператора" data-kk="Оператор панелі">Панель оператора</h1>
+      <p class="sub" data-ru="Введите пароль администратора (по умолчанию: admin123)" data-kk="Админ құпиясөзін енгізіңіз (әдепкі: admin123)">Введите пароль администратора (по умолчанию: admin123)</p>
+      <div class="field">
+        <label for="l-pass" data-ru="Пароль" data-kk="Құпиясөз">Пароль</label>
+        <input id="l-pass" name="password" type="password" placeholder="••••••••" required />
+      </div>
+      <div id="login-err"></div>
+      <button class="btn block" type="submit" id="login-btn" data-ru="Войти" data-kk="Кіру">Войти</button>
+      <p class="muted small center" style="margin:18px 0 0"><a href="/" data-ru="← На главную страницу" data-kk="← Басты бетке қайту">← На главную страницу</a></p>
+    </form>
+  </div>
+
+  <!-- ============ НЕГІЗГІ ПАНЕЛЬ ============ -->
+  <div class="admin-layout hidden" id="app">
+    <aside class="sidebar">
+      <a href="/" class="logo" data-logo></a>
+      <a class="side-link active" data-tab="requests">
+        <span data-icon="inbox" data-size="18"></span>
+        <span data-ru="Заявки" data-kk="Өтінімдер">Заявки</span>
+        <span class="cnt hidden" id="new-cnt">0</span>
+      </a>
+      <a class="side-link" data-tab="clinics">
+        <span data-icon="hospital" data-size="18"></span>
+        <span data-ru="Клиники-партнёры" data-kk="Серіктес клиникалар">Клиники-партнёры</span>
+      </a>
+      <div class="bottom">
+        <div style="padding:6px 8px"><div data-lang-switch="dark"></div></div>
+        <a class="side-link" href="/" target="_blank">
+          <span data-icon="link" data-size="18"></span>
+          <span data-ru="Открыть сайт" data-kk="Сайтты ашу">Открыть сайт</span>
+        </a>
+        <a class="side-link" id="logout">
+          <span data-icon="logout" data-size="18"></span>
+          <span data-ru="Выйти" data-kk="Шығу">Выйти</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <!-- Өтінімдер тізімі -->
+      <div id="tab-requests">
+        <div class="page-title">
+          <div>
+            <h1 data-ru="Заявки и аналитика" data-kk="Өтінімдер мен аналитика">Заявки и аналитика</h1>
+            <div class="muted small" data-ru="Управление корпоративными заказами и медосмотрами" data-kk="Барлық корпоративтік тапсырыстарды басқару">Управление корпоративными заказами и медосмотрами</div>
+          </div>
+          <div class="flex">
+            <select id="filter" style="width:auto"></select>
+            <div class="search">
+              <span data-icon="search" data-size="16"></span>
+              <input id="req-search" data-ph-ru="Компания, БИН или телефон…" data-ph-kk="Компания, БСН немесе телефон…" placeholder="Компания, БИН или телефон…" />
+            </div>
+          </div>
+        </div>
+
+        <div class="grid g-4" id="stats" style="margin-bottom:24px"></div>
+
+        <div class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>№</th>
+                  <th data-ru="Компания / БИН" data-kk="Компания / БСН">Компания / БИН</th>
+                  <th data-ru="Контакт" data-kk="Байланыс">Контакт</th>
+                  <th data-ru="Тип осмотра / Клиника" data-kk="Тексеру түрі / Клиника">Тип осмотра / Клиника</th>
+                  <th data-ru="Сотр." data-kk="Адам">Сотр.</th>
+                  <th data-ru="Сумма" data-kk="Сома">Сумма</th>
+                  <th data-ru="Прогресс" data-kk="Барысы">Прогресс</th>
+                  <th data-ru="Статус" data-kk="Мәртебе">Статус</th>
+                  <th data-ru="Дата" data-kk="Күні">Дата</th>
+                </tr>
+              </thead>
+              <tbody id="req-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Өтінім мәліметі -->
+      <div id="tab-detail" class="hidden">
+        <a class="back-link" id="back">
+          <span data-icon="arrowLeft" data-size="18"></span>
+          <span data-ru="Назад к списку заявок" data-kk="Өтінімдер тізіміне қайту">Назад к списку заявок</span>
+        </a>
+        <div id="detail"></div>
+      </div>
+
+      <!-- Клиникалар -->
+      <div id="tab-clinics" class="hidden">
+        <div class="page-title">
+          <div>
+            <h1 data-ru="Клиники-партнёры" data-kk="Серіктес клиникалар">Клиники-партнёры</h1>
+            <div class="muted small" data-ru="Лицензированные медицинские центры и выездные бригады" data-kk="Медициналық тексеру өткізетін лицензияланған ұйымдар мен көшпелі бригадалар">Лицензированные медицинские центры и выездные бригады</div>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <div class="panel">
+            <div class="panel-head"><h3 data-ru="Список клиник" data-kk="Клиникалар тізімі">Список клиник</h3></div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th data-ru="Название" data-kk="Атауы">Название</th>
+                    <th data-ru="Адрес" data-kk="Мекенжайы">Адрес</th>
+                    <th data-ru="Телефон" data-kk="Телефон">Телефон</th>
+                    <th data-ru="Лицензия" data-kk="Лицензия">Лицензия</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="clinic-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <form id="clinic-form" class="panel">
+            <div class="panel-head"><h3 data-ru="Добавить клинику" data-kk="Жаңа клиника қосу">Добавить клинику</h3></div>
+            <div class="panel-body">
+              <div class="field"><label data-ru="Название *" data-kk="Атауы *">Название *</label><input name="name" data-ph-ru="МЦ «Шипагер»" data-ph-kk="«Шипагер» МО" placeholder="МЦ «Шипагер»" required /></div>
+              <div class="field"><label data-ru="Адрес" data-kk="Мекенжайы">Адрес</label><input name="address" data-ph-ru="г. Шымкент, пр. Кунаева 25" data-ph-kk="Шымкент, Қонаев даңғ. 25" placeholder="г. Шымкент, пр. Кунаева 25" /></div>
+              <div class="field"><label data-ru="Телефон" data-kk="Телефон">Телефон</label><input name="phone" placeholder="+7 (7252) 55-10-20" /></div>
+              <div class="field"><label data-ru="Номер лицензии" data-kk="Лицензия нөмірі">Номер лицензии</label><input name="license" placeholder="№ 0012345DF" /></div>
+              <button class="btn block" type="submit" data-ru="Добавить в базу" data-kk="Тізімге қосу">Добавить в базу</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/common.js"></script>
+  <script>
+    let token = localStorage.getItem("admin_token");
+    let clinics = [];
+    let allRequests = [];
+    let lastStats = null;
+    let currentReq = null;
+    let currentTab = "requests";
+    const $ = (id) => document.getElementById(id);
+    const REQ_ST = ["new", "confirmed", "scheduled", "in_progress", "done", "cancelled"];
+    const EMP_ST = ["pending", "scheduled", "fit", "unfit", "absent"];
+
+    function populateFilter() {
+      const cur = $("filter").value;
+      $("filter").innerHTML = `<option value="">${t("Все статусы", "Барлық мәртебе")}</option>` +
+        REQ_ST.map((s) => `<option value="${s}" ${s === cur ? "selected" : ""}>${statusLabel(s)}</option>`).join("");
+    }
+
+    function show(tab) {
+      currentTab = tab;
+      ["requests", "detail", "clinics"].forEach((k) => $("tab-" + k).classList.toggle("hidden", k !== tab));
+      document.querySelectorAll(".side-link[data-tab]").forEach((a) => {
+        a.classList.toggle("active", a.dataset.tab === (tab === "detail" ? "requests" : tab));
+      });
+    }
+
+    function showLogin() {
+      localStorage.removeItem("admin_token");
+      token = null;
+      $("login-screen").classList.remove("hidden");
+      $("app").classList.add("hidden");
+    }
+
+    function call(path, opts = {}) {
+      return api(path, { ...opts, token }).catch((e) => {
+        if (e.status === 401) showLogin();
+        throw e;
+      });
+    }
+
+    async function start() {
+      $("login-screen").classList.add("hidden");
+      $("app").classList.remove("hidden");
+      populateFilter();
+      clinics = await call("/api/admin/clinics");
+      await loadRequests();
+    }
+
+    async function loadRequests() {
+      show("requests");
+      const [stats, reqs] = await Promise.all([call("/api/admin/stats"), call("/api/admin/requests")]);
+      lastStats = stats;
+      allRequests = reqs;
+      renderStats();
+      renderRequests();
+    }
+
+    function renderStats() {
+      if (!lastStats) return;
+      const stats = lastStats;
+      const cnt = $("new-cnt");
+      cnt.textContent = stats.new;
+      cnt.classList.toggle("hidden", !stats.new);
+
+      $("stats").innerHTML = `
+        <div class="stat">
+          <span class="s-ic">${icon("inbox")}</span>
+          <div class="label">${t("Всего заявок", "Барлық өтінім")}</div>
+          <div class="value">${stats.requests}</div>
+          <div class="hint">${t("новых:", "жаңа:")} <b>${stats.new}</b></div>
+        </div>
+        <div class="stat">
+          <span class="s-ic amber">${icon("users")}</span>
+          <div class="label">${t("Сотрудники", "Қызметкерлер")}</div>
+          <div class="value">${stats.examined}<span class="muted" style="font-size:16px;font-weight:600"> / ${stats.employees}</span></div>
+          <div class="hint">${t("прошли осмотр", "тексеруден өтті")}</div>
+        </div>
+        <div class="stat">
+          <span class="s-ic violet">${icon("chart")}</span>
+          <div class="label">${t("Общий оборот", "Жалпы айналым")}</div>
+          <div class="value">${fmtMoney(stats.revenue)}</div>
+          <div class="hint">${t("по подтверждённым заявкам", "расталған өтінімдер бойынша")}</div>
+        </div>
+        <div class="stat">
+          <span class="s-ic coral">${icon("wallet")}</span>
+          <div class="label">${t("Чистая комиссия (10%)", "Таза комиссия (10%)")}</div>
+          <div class="value">${fmtMoney(stats.service_fee)}</div>
+          <div class="hint">${t("доход платформы", "платформа табысы")}</div>
+        </div>`;
+    }
+
+    function renderRequests() {
+      const f = $("filter").value;
+      const q = $("req-search").value.trim().toLowerCase();
+      const list = allRequests.filter((r) =>
+        (!f || r.status === f) &&
+        (!q || r.company.toLowerCase().includes(q) || (r.bin || "").includes(q) || (r.phone || "").includes(q) || String(r.id) === q)
+      );
+      if (!list.length) {
+        $("req-body").innerHTML = `<tr><td colspan="9"><div class="empty"><div class="ic">🗂️</div><b>${t("Заявки не найдены", "Өтінімдер табылмады")}</b><div>${t("Измените фильтр или ожидайте новых заявок", "Сүзгіні өзгертіңіз немесе жаңа өтінім күтіңіз")}</div></div></td></tr>`;
+        return;
+      }
+      $("req-body").innerHTML = list.map((r) => {
+        const total = r.employees_loaded;
+        const done = r.progress.fit + r.progress.unfit;
+        return `<tr class="clickable" onclick="openRequest(${r.id})">
+          <td class="muted"><b>#${r.id}</b></td>
+          <td><b>${esc(r.company)}</b><div class="muted small">${r.bin ? t("БИН ", "БСН ") + esc(r.bin) : "—"}</div></td>
+          <td>${esc(r.contact_name)}<div class="muted small">${esc(r.phone)}</div></td>
+          <td class="small"><b>${esc(examName(r))}</b><div class="muted small">${r.clinic ? esc(r.clinic.name) : t("Клиника не назначена", "Клиника таңдалмаған")}</div></td>
+          <td><b>${r.employees_loaded}</b> <span class="muted small">/ ${r.employees_count}</span></td>
+          <td><b>${fmtMoney(r.price.total)}</b><div class="muted small">${t("комиссия ", "комиссия ")}${fmtMoney(r.price.service_fee)}</div></td>
+          <td style="min-width:130px">${progressBar(r.progress, total)}<div class="muted small" style="margin-top:4px">${done} / ${total} ${t("прошли", "өтті")}</div></td>
+          <td>${badge(r.status)}</td>
+          <td class="small muted">${fmtDate(r.created_at)}</td>
+        </tr>`;
+      }).join("");
+    }
+
+    async function openRequest(id) {
+      const r = await call("/api/admin/requests/" + id);
+      currentReq = r;
+      show("detail");
+      renderDetail();
+    }
+
+    function renderDetail() {
+      if (!currentReq) return;
+      const r = currentReq;
+      const cabUrl = `${location.origin}/cabinet?id=${r.id}&code=${r.access_code}`;
+      const waPhone = waDigits(r.phone);
+      const waText = encodeURIComponent(
+        t(
+          `Здравствуйте, ${r.contact_name}! Сервис MedTekser. Ваша ссылка в личный кабинет по заявке №${r.id} (${r.company}): ${cabUrl}`,
+          `Сәлеметсіз бе, ${r.contact_name}! MedTekser сервисі. №${r.id} (${r.company}) өтініміңіз бойынша жеке кабинет сілтемесі: ${cabUrl}`
+        )
+      );
+
+      $("detail").innerHTML = `
+        <div class="page-title">
+          <div>
+            <div class="muted small">${t("Заявка", "Өтінім")} #${r.id} · ${fmtDate(r.created_at)}</div>
+            <h1>${esc(r.company)}</h1>
+            <div>${badge(r.status)} <span class="muted small" style="margin-left:8px">${esc(examName(r))}</span></div>
+          </div>
+          <div class="flex">
+            <button class="btn ghost sm" type="button" onclick="copyCabLink('${esc(cabUrl)}')">${icon("link", 16)} ${t("Скопировать ссылку в кабинет", "Кабинет сілтемесін көшіру")}</button>
+            ${waPhone ? `<a class="btn ghost sm" href="https://wa.me/${waPhone}?text=${waText}" target="_blank" rel="noopener">${t("Отправить клиенту в WhatsApp", "Клиентке WhatsApp-қа жіберу")}</a>` : ""}
+            <button class="btn sm" type="button" onclick="exportCsv(${r.id})">${icon("download", 16)} ${t("Скачать CSV (Excel)", "CSV (Excel) жүктеу")}</button>
+          </div>
+        </div>
+
+        <div class="detail-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>${t("Данные заказа", "Тапсырыс деректері")}</h3>
+              <span class="code-pill" style="padding:4px 12px;margin:0"><small>${t("Код кабинета:", "Кабинет коды:")} <b>${esc(r.access_code)}</b></small></span>
+            </div>
+            <div class="panel-body">
+              <dl class="kv">
+                <dt>${t("Компания / БИН", "Компания / БСН")}</dt><dd>${esc(r.company)} ${r.bin ? `<span class="muted">(${esc(r.bin)})</span>` : ""}</dd>
+                <dt>${t("Контактное лицо", "Байланыс тұлға")}</dt><dd>${esc(r.contact_name)}</dd>
+                <dt>${t("Телефон / Email", "Телефон / Email")}</dt><dd><a href="tel:${esc(r.phone)}">${esc(r.phone)}</a> ${r.email ? `· <a href="mailto:${esc(r.email)}">${esc(r.email)}</a>` : ""}</dd>
+                <dt>${t("Тип медосмотра", "Тексеру түрі")}</dt><dd>${esc(examName(r))}</dd>
+                <dt>${t("Сотрудники", "Қызметкер саны")}</dt><dd>${r.employees_count} ${t("чел. (загружено:", "адам (тізімде:")} ${r.employees.length})</dd>
+                <dt>${t("Желаемая дата", "Қалаған күні")}</dt><dd>${fmtDate(r.preferred_date)}</dd>
+                <dt>${t("Комментарий", "Пікір")}</dt><dd>${esc(r.comment || "—")}</dd>
+              </dl>
+              <div style="margin-top:20px;padding:16px;background:var(--brand-50);border:1px solid var(--brand-100);border-radius:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+                <div>
+                  <div class="muted small">${t("Осмотр:", "Тексеру:")} ${fmtMoney(r.price.subtotal)} + ${t("Комиссия:", "Комиссия:")} ${fmtMoney(r.price.service_fee)}</div>
+                  <div style="font-size:26px;font-weight:800;color:var(--brand-700)">${fmtMoney(r.price.total)}</div>
+                </div>
+                <div style="min-width:200px">
+                  ${progressBar(r.progress, r.employees.length)}
+                  <div class="muted small" style="margin-top:6px">${t("Завершено:", "Дайын:")} ${r.progress.fit + r.progress.unfit} / ${r.employees.length}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <form class="panel" id="req-form">
+            <div class="panel-head"><h3>${t("Управление заявкой", "Өтінімді басқару")}</h3></div>
+            <div class="panel-body">
+              <div class="field">
+                <label>${t("Статус заявки", "Өтінім мәртебесі")}</label>
+                <select name="status">${REQ_ST.map((s) => `<option value="${s}" ${s === r.status ? "selected" : ""}>${statusLabel(s)}</option>`).join("")}</select>
+              </div>
+              <div class="field">
+                <label>${t("Клиника / выездная бригада", "Серіктес клиника")}</label>
+                <select name="clinic_id">
+                  <option value="">${t("— Не назначена —", "— Таңдалмаған —")}</option>
+                  ${clinics.map((c) => `<option value="${c.id}" ${c.id === r.clinic_id ? "selected" : ""}>${esc(c.name)}</option>`).join("")}
+                </select>
+              </div>
+              <div class="field">
+                <label>${t("Утверждённая дата осмотра", "Бекітілген тексеру күні")}</label>
+                <input type="date" name="scheduled_date" value="${esc(r.scheduled_date || "")}" />
+              </div>
+              <button class="btn block" type="submit" id="save-req-btn">${t("Сохранить изменения", "Өзгерістерді сақтау")}</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3>${t("Список сотрудников", "Қызметкерлер тізімі")} (${r.employees.length})</h3>
+            <div class="flex">
+              ${r.employees.length ? `
+                <button class="btn ghost sm" type="button" onclick="bulkStatus(${r.id}, 'scheduled')">${t("Всем «Назначена»", "Барлығын «Жоспарланды»")}</button>
+                <button class="btn ghost sm" type="button" onclick="bulkStatus(${r.id}, 'fit')">${t("Ожидающим → «Годен»", "Күтудегілерді → «Жарамды»")}</button>
+              ` : ""}
+              <div class="search">
+                ${icon("search", 16)}
+                <input id="detail-emp-search" placeholder="${t("Поиск сотрудника…", "Қызметкерді іздеу…")}" oninput="renderDetailEmps()" />
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>${t("ФИО / Должность", "ТАӘ / Лауазымы")}</th>
+                  <th>${t("ИИН", "ЖСН")}</th>
+                  <th>${t("Вредный фактор", "Зиянды фактор")}</th>
+                  <th>${t("Статус", "Мәртебе")}</th>
+                  <th>${t("Заключение врача", "Дәрігер қорытындысы")}</th>
+                </tr>
+              </thead>
+              <tbody id="detail-emp-body"></tbody>
+            </table>
+          </div>
+        </div>`;
+
+      renderDetailEmps();
+
+      $("req-form").addEventListener("submit", async (ev) => {
+        ev.preventDefault();
+        const btn = $("save-req-btn");
+        setBusy(btn, true, t("Сохранение…", "Сақталуда…"));
+        try {
+          const data = Object.fromEntries(new FormData(ev.target));
+          await call("/api/admin/requests/" + r.id, { method: "PUT", body: data });
+          toast(t("Заявка обновлена", "Өтінім жаңартылды"));
+          await openRequest(r.id);
+        } catch (err) {
+          toast(err.message, "err");
+        } finally {
+          setBusy(btn, false);
+        }
+      });
+    }
+
+    function renderDetailEmps() {
+      const r = currentReq;
+      if (!r) return;
+      const q = ($("detail-emp-search")?.value || "").trim().toLowerCase();
+      if (!r.employees.length) {
+        $("detail-emp-body").innerHTML = `<tr><td colspan="6"><div class="empty"><div class="ic">👥</div><b>${t("Компания ещё не загрузила список", "Компания тізімді әлі жүктемеген")}</b><div>${t("Отправьте клиенту ссылку на личный кабинет", "Кабинет сілтемесін клиентке жіберіңіз")}</div></div></td></tr>`;
+        return;
+      }
+      const list = r.employees.filter((e) => !q || e.full_name.toLowerCase().includes(q) || (e.iin || "").includes(q));
+      $("detail-emp-body").innerHTML = list.map((e, i) => `
+        <tr>
+          <td class="muted">${i + 1}</td>
+          <td><b>${esc(e.full_name)}</b><div class="muted small">${esc(e.position || "—")}</div></td>
+          <td class="small">${esc(e.iin || "—")}</td>
+          <td class="small">${esc(e.harmful_factor || "—")}</td>
+          <td style="width:175px">
+            <select onchange="updEmp(${e.id}, {status:this.value})">
+              ${EMP_ST.map((s) => `<option value="${s}" ${s === e.status ? "selected" : ""}>${statusLabel(s)}</option>`).join("")}
+            </select>
+          </td>
+          <td>
+            <input value="${esc(e.conclusion || "")}" placeholder="${t("Напр.: Годен к работе без ограничений", "Мысалы: Жұмысқа жарамды, шектеу жоқ")}" onchange="updEmp(${e.id}, {conclusion:this.value})" />
+          </td>
+        </tr>`).join("");
+    }
+
+    async function updEmp(id, body) {
+      try {
+        await call("/api/admin/employees/" + id, { method: "PUT", body });
+        toast(t("Сохранено", "Сақталды"));
+      } catch (e) {
+        toast(e.message, "err");
+      }
+    }
+
+    async function bulkStatus(rid, status) {
+      try {
+        await call(`/api/admin/requests/${rid}/employees`, { method: "PUT", body: { status } });
+        toast(t("Статусы обновлены", "Мәртебелер жаңартылды"));
+        openRequest(rid);
+      } catch (e) {
+        toast(e.message, "err");
+      }
+    }
+
+    function copyCabLink(url) {
+      navigator.clipboard?.writeText(url);
+      toast(t("Ссылка скопирована", "Кабинет сілтемесі көшірілді"));
+    }
+
+    async function exportCsv(rid) {
+      try {
+        await downloadFile(`/api/admin/requests/${rid}/export`, token, `medtekser_request_${rid}.csv`);
+      } catch (e) {
+        toast(e.message, "err");
+      }
+    }
+
+    async function loadClinics() {
+      show("clinics");
+      clinics = await call("/api/admin/clinics");
+      renderClinics();
+    }
+
+    function renderClinics() {
+      $("clinic-body").innerHTML = clinics.length ? clinics.map((c) => `
+        <tr>
+          <td class="muted">${c.id}</td>
+          <td><b>${esc(c.name)}</b></td>
+          <td class="small">${esc(c.address || "—")}</td>
+          <td class="small">${esc(c.phone || "—")}</td>
+          <td class="small">${esc(c.license || "—")}</td>
+          <td><button class="icon-btn" title="${t("Удалить", "Өшіру")}" onclick="delClinic(${c.id})">${icon("x", 16)}</button></td>
+        </tr>`).join("") : `<tr><td colspan="6" class="empty">${t("Нет клиник", "Клиникалар жоқ")}</td></tr>`;
+    }
+
+    async function delClinic(id) {
+      if (!confirm(t("Удалить клинику из базы?", "Клиниканы тізімнен өшіресіз бе?"))) return;
+      try {
+        await call("/api/admin/clinics/" + id, { method: "DELETE" });
+        toast(t("Клиника удалена", "Клиника өшірілді"));
+        loadClinics();
+      } catch (e) {
+        toast(e.message, "err");
+      }
+    }
+
+    window.onLangChange = () => {
+      populateFilter();
+      if (!token) return;
+      if (currentTab === "requests") { renderStats(); renderRequests(); }
+      else if (currentTab === "detail") renderDetail();
+      else if (currentTab === "clinics") renderClinics();
+    };
+
+    $("clinic-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      try {
+        await call("/api/admin/clinics", { method: "POST", body: Object.fromEntries(new FormData(e.target)) });
+        e.target.reset();
+        toast(t("Клиника добавлена", "Клиника қосылды"));
+        loadClinics();
+      } catch (err) {
+        toast(err.message, "err");
+      }
+    });
+
+    $("filter").addEventListener("change", renderRequests);
+    $("req-search").addEventListener("input", renderRequests);
+    $("back").addEventListener("click", (e) => { e.preventDefault(); loadRequests(); });
+    document.querySelectorAll(".side-link[data-tab]").forEach((a) => a.addEventListener("click", (e) => {
+      e.preventDefault();
+      a.dataset.tab === "clinics" ? loadClinics() : loadRequests();
+    }));
+
+    $("logout").addEventListener("click", async (e) => {
+      e.preventDefault();
+      await api("/api/logout", { method: "POST", token }).catch(() => {});
+      showLogin();
+    });
+
+    $("login").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = $("login-btn");
+      setBusy(btn, true, t("Проверка…", "Тексерілуде…"));
+      try {
+        const r = await api("/api/admin/login", { method: "POST", body: { password: e.target.password.value } });
+        token = r.token;
+        localStorage.setItem("admin_token", token);
+        await start();
+      } catch (err) {
+        $("login-err").innerHTML = `<div class="alert err">${esc(err.message)}</div>`;
+      } finally {
+        setBusy(btn, false);
+      }
+    });
+
+    populateFilter();
+    if (token) start().catch(() => {});
+  </script>
+</body>
+</html>
