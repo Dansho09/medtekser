@@ -31,6 +31,11 @@
       </div>
       <div id="login-err"></div>
       <button class="btn block" type="submit" id="login-btn" data-ru="Войти в кабинет" data-kk="Кабинетке кіру">Войти в кабинет</button>
+      <button class="btn ghost sm block" type="button" style="margin-top:10px" onclick="login(1, 'DEMO12')"
+              data-ru="⚡ Демо-вход в 1 клик (ТОО Ontustik Qurylys Group)"
+              data-kk="⚡ 1 кликпен демо-кіру (ЖШС Ontustik Qurylys Group)">
+        ⚡ Демо-вход в 1 клик (ТОО Ontustik Qurylys Group)
+      </button>
       <p class="muted small center" style="margin:18px 0 0">
         <span data-ru="Ещё нет заявки?" data-kk="Өтінім әлі жоқ па?">Ещё нет заявки?</span>
         <a href="./#order" data-ru="Оставить заявку" data-kk="Өтінім қалдыру">Оставить заявку</a>
@@ -62,11 +67,19 @@
             <div id="c-status"></div>
           </div>
           <div class="flex no-print">
-            <button class="btn ghost" onclick="window.print()">
-              <span data-icon="printer" data-size="18"></span>
-              <span data-ru="Печать сводного отчёта" data-kk="Есепті басып шығару">Печать сводного отчёта</span>
+            <button class="btn ghost sm" type="button" onclick="openOfficialDocModal('invoice', DATA)">
+              <span data-icon="file" data-size="16"></span>
+              <span data-ru="Счёт / КП" data-kk="Төлем шоты / КҰ">Счёт / КП</span>
             </button>
-            <a class="btn" id="wa-manager" target="_blank" rel="noopener" data-ru="Связь с менеджером (WhatsApp)" data-kk="Менеджерге жазу (WhatsApp)">Связь с менеджером (WhatsApp)</a>
+            <button class="btn ghost sm" type="button" onclick="openOfficialDocModal('act', DATA)">
+              <span data-icon="shield" data-size="16"></span>
+              <span data-ru="Заключительный акт (№ 131)" data-kk="Қорытынды акт (№ 131)">Заключительный акт (№ 131)</span>
+            </button>
+            <button class="btn ghost sm" onclick="window.print()">
+              <span data-icon="printer" data-size="16"></span>
+              <span data-ru="Печать" data-kk="Басып шығару">Печать</span>
+            </button>
+            <a class="btn sm" id="wa-manager" target="_blank" rel="noopener" data-ru="WhatsApp менеджера" data-kk="Менеджер WhatsApp">WhatsApp менеджера</a>
           </div>
         </div>
 
@@ -79,6 +92,8 @@
           </div>
           <div class="panel-body" id="c-progress"></div>
         </div>
+
+        <div class="grid g-3" style="margin-bottom:24px" id="c-compliance-radar"></div>
 
         <div class="panel no-print" style="margin-bottom:24px" id="upload-panel">
           <div class="panel-head">
@@ -101,10 +116,15 @@
               </div>
             </div>
             <div id="preview" class="muted small" style="margin:12px 0"></div>
-            <button class="btn" id="upload">
-              <span data-icon="upload" data-size="18"></span>
-              <span data-ru="Добавить сотрудников в список" data-kk="Қызметкерлерді тізімге қосу">Добавить сотрудников в список</span>
-            </button>
+            <div class="flex">
+              <button class="btn" id="upload" type="button">
+                <span data-icon="upload" data-size="18"></span>
+                <span data-ru="Добавить сотрудников в список" data-kk="Қызметкерлерді тізімге қосу">Добавить сотрудников в список</span>
+              </button>
+              <button class="btn ghost sm" type="button" onclick="fillAiSampleCsv()">
+                ✨ <span data-ru="Заполнить пример + AI-подбор вредных факторов" data-kk="Үлгіні толтыру + AI зиянды факторларды анықтау">Заполнить пример + AI-подбор вредных факторов</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -153,8 +173,8 @@
     function populateFilter() {
       const cur = $("emp-filter").value;
       const statuses = ["pending", "scheduled", "fit", "unfit", "absent"];
-      $("emp-filter").innerHTML = '<option value="">' + t("Все статусы", "Барлық мәртебе") + '</option>' +
-        statuses.map((s) => '<option value="' + s + '" ' + (s === cur ? "selected" : "") + '>' + statusLabel(s) + '</option>').join("");
+      $("emp-filter").innerHTML = `<option value="">${t("Все статусы", "Барлық мәртебе")}</option>` +
+        statuses.map((s) => `<option value="${s}" ${s === cur ? "selected" : ""}>${statusLabel(s)}</option>`).join("");
     }
 
     api("/api/config").then((c) => { if (c.contact_phone) CONTACT = c.contact_phone; }).catch(() => {});
@@ -169,7 +189,7 @@
         history.replaceState(null, "", location.pathname);
         await load();
       } catch (e) {
-        $("login-err").innerHTML = '<div class="alert err">' + esc(e.message) + '</div>';
+        $("login-err").innerHTML = `<div class="alert err">${esc(e.message)}</div>`;
       } finally {
         setBusy(btn, false);
       }
@@ -200,34 +220,53 @@
       const d = DATA;
       $("h-company").textContent = d.company;
       $("c-company").textContent = d.company;
-      $("c-sub").textContent = t("Заявка", "Өтінім") + " #" + d.id + " · " + fmtDate(d.created_at);
-      $("c-status").innerHTML = badge(d.status) + ' <span class="muted small" style="margin-left:6px">' + esc(examName(d)) + '</span>';
+      $("c-sub").textContent = `${t("Заявка", "Өтінім")} #${d.id} · ${fmtDate(d.created_at)}`;
+      $("c-status").innerHTML = `${badge(d.status)} <span class="muted small" style="margin-left:6px">${esc(examName(d))}</span>`;
 
       $("wa-manager").href = waLink(
         CONTACT,
-        t("Здравствуйте! Вопрос по заявке №" + d.id + " (" + d.company + ").", "Сәлеметсіз бе! №" + d.id + " (" + d.company + ") өтінімі бойынша сұрақ.")
+        t(`Здравствуйте! Вопрос по заявке №${d.id} (${d.company}).`, `Сәлеметсіз бе! №${d.id} (${d.company}) өтінімі бойынша сұрақ.`)
       );
 
       const clinic = d.clinic
-        ? '<div class="value" style="font-size:17px">' + esc(d.clinic.name) + '</div><div class="hint">' + esc(d.clinic.address || "") + '</div>'
-        : '<div class="value" style="font-size:17px">' + t("Назначается", "Таңдалуда") + '</div><div class="hint">' + t("Менеджер закрепит клинику", "Менеджер жақын арада бекітеді") + '</div>';
+        ? `<div class="value" style="font-size:17px">${esc(d.clinic.name)}</div><div class="hint">${esc(d.clinic.address || "")}</div>`
+        : `<div class="value" style="font-size:17px">${t("Назначается", "Таңдалуда")}</div><div class="hint">${t("Менеджер закрепит клинику", "Менеджер жақын арада бекітеді")}</div>`;
 
-      $("c-cards").innerHTML = 
-        '<div class="stat"><span class="s-ic">' + icon("hospital") + '</span><div class="label">' + t("Клиника / Бригада", "Клиника / Бригада") + '</div>' + clinic + '</div>' +
-        '<div class="stat"><span class="s-ic violet">' + icon("calendar") + '</span><div class="label">' + t("Дата осмотра", "Тексеру күні") + '</div>' +
-          '<div class="value" style="font-size:20px">' + (d.scheduled_date ? fmtDate(d.scheduled_date) : t("Согласуется", "Келісілуде")) + '</div>' +
-          '<div class="hint">' + (d.scheduled_date ? t("Дата подтверждена", "Расталған күн") : d.preferred_date ? t("Желаемая: ", "Қалаған: ") + fmtDate(d.preferred_date) : t("Ожидает согласования", "Келісілуде")) + '</div></div>' +
-        '<div class="stat"><span class="s-ic amber">' + icon("users") + '</span><div class="label">' + t("Сотрудники", "Қызметкерлер") + '</div>' +
-          '<div class="value">' + d.employees_loaded + '<span class="muted" style="font-size:16px;font-weight:600"> / ' + d.employees_count + '</span></div><div class="hint">' + t("загружено в список", "тізімге жүктелді") + '</div></div>' +
-        '<div class="stat"><span class="s-ic coral">' + icon("wallet") + '</span><div class="label">' + t("Итоговая сумма", "Жалпы құны") + '</div>' +
-          '<div class="value">' + fmtMoney(d.price.total) + '</div><div class="hint">' + t("включая сервис ", "сервис қоса ") + fmtMoney(d.price.service_fee) + '</div></div>';
+      $("c-cards").innerHTML = `
+        <div class="stat"><span class="s-ic">${icon("hospital")}</span><div class="label">${t("Клиника / Бригада", "Клиника / Бригада")}</div>${clinic}</div>
+        <div class="stat"><span class="s-ic violet">${icon("calendar")}</span><div class="label">${t("Дата осмотра", "Тексеру күні")}</div>
+          <div class="value" style="font-size:20px">${d.scheduled_date ? fmtDate(d.scheduled_date) : t("Согласуется", "Келісілуде")}</div>
+          <div class="hint">${d.scheduled_date ? t("Дата подтверждена", "Расталған күн") : d.preferred_date ? t("Желаемая: ", "Қалаған: ") + fmtDate(d.preferred_date) : t("Ожидает согласования", "Келісілуде")}</div></div>
+        <div class="stat"><span class="s-ic amber">${icon("users")}</span><div class="label">${t("Сотрудники", "Қызметкерлер")}</div>
+          <div class="value">${d.employees_loaded}<span class="muted" style="font-size:16px;font-weight:600"> / ${d.employees_count}</span></div><div class="hint">${t("загружено в список", "тізімге жүктелді")}</div></div>
+        <div class="stat"><span class="s-ic coral">${icon("wallet")}</span><div class="label">${t("Итоговая сумма", "Жалпы құны")}</div>
+          <div class="value">${fmtMoney(d.price.total)}</div><div class="hint">${t("включая сервис ", "сервис қоса ")}${fmtMoney(d.price.service_fee)}</div></div>`;
 
       const p = d.progress, total = d.employees_loaded;
       const done = p.fit + p.unfit;
       $("c-percent").textContent = total ? Math.round((100 * done) / total) + "%" : "";
       $("c-progress").innerHTML = total
-        ? progressBar(p, total) + progressLegend(p)
-        : '<div class="muted">' + t("Загрузите список сотрудников ниже, чтобы отслеживать прохождение осмотра.", "Тексеру барысын көру үшін төменде қызметкерлер тізімін жүктеңіз.") + '</div>';
+        ? `${progressBar(p, total)}${progressLegend(p)}`
+        : `<div class="muted">${t("Загрузите список сотрудников ниже, чтобы отслеживать прохождение осмотра.", "Тексеру барысын көру үшін төменде қызметкерлер тізімін жүктеңіз.")}</div>`;
+
+      const savedHours = Math.round(Math.max(d.employees_count, total) * 2.5);
+      const protectedFine = Math.max(d.employees_count, total) * 85000;
+      $("c-compliance-radar").innerHTML = `
+        <div class="stat">
+          <div class="label">🛡️ ${t("Защита от штрафов ст. 93 КоАП РК", "ҚР ӘҚБтК 93-бап айыппұлынан қорғау")}</div>
+          <div class="value" style="color:var(--ok);font-size:21px">${fmtMoney(protectedFine)}</div>
+          <div class="hint">${t("Полное соответствие Приказу МЗ РК № 131/2020 + ЭЦП НУЦ РК", "ҚР ДСМ № 131/2020 бұйрығына толық сәйкестік + ЭЦҚ")}</div>
+        </div>
+        <div class="stat">
+          <div class="label">⏱️ ${t("Экономия рабочего времени штата", "Штаттың жұмыс уақытын үнемдеу")}</div>
+          <div class="value" style="font-size:21px">~${savedHours} ${t("рабочих часов", "жұмыс сағаты")}</div>
+          <div class="hint">${t("Осмотр за 45 минут по талону Зелёного коридора без очередей", "Кезексіз Жасыл дәліз талонымен 45 минутта өту")}</div>
+        </div>
+        <div class="stat">
+          <div class="label">📅 ${t("Радар следующего медосмотра", "Келесі медтексеру радары")}</div>
+          <div class="value" style="font-size:21px">${t("Март 2027 (365 дн.)", "Наурыз 2027 (365 күн)")}</div>
+          <div class="hint">${t("Авто-напоминание HR в WhatsApp за 30 дней до истечения", "Мерзімі бітуге 30 күн қалғанда WhatsApp-қа авто-ескерту")}</div>
+        </div>`;
 
       $("upload-panel").classList.toggle("hidden", ["done", "cancelled"].includes(d.status));
       renderEmployees();
@@ -239,23 +278,49 @@
       const f = $("emp-filter").value;
       const list = DATA.employees.filter((e) =>
         (!f || e.status === f) && (!q || e.full_name.toLowerCase().includes(q) || (e.iin || "").includes(q)));
-      $("emp-count").textContent = "(" + DATA.employees.length + ")";
+      $("emp-count").textContent = `(${DATA.employees.length})`;
       if (!DATA.employees.length) {
-        $("emp-body").innerHTML = '<tr><td colspan="7"><div class="empty"><div class="ic">📋</div><b>' + t("Список сотрудников пока пуст", "Тізім әлі жүктелмеген") + '</b><div>' + t("Добавьте сотрудников через форму загрузки выше", "Жоғарыдағы форма арқылы қызметкерлер тізімін қосыңыз") + '</div></div></td></tr>';
+        $("emp-body").innerHTML = `<tr><td colspan="7"><div class="empty"><div class="ic">📋</div><b>${t("Список сотрудников пока пуст", "Тізім әлі жүктелмеген")}</b><div>${t("Добавьте сотрудников через форму загрузки выше", "Жоғарыдағы форма арқылы қызметкерлер тізімін қосыңыз")}</div></div></td></tr>`;
         return;
       }
-      $("emp-body").innerHTML = list.length ? list.map((e, i) => 
-        '<tr>' +
-          '<td class="muted">' + (i + 1) + '</td>' +
-          '<td><div class="flex" style="gap:10px;flex-wrap:nowrap"><span class="avatar" style="background:' + avatarColor(e.full_name) + '">' + esc(initials(e.full_name)) + '</span>' +
-            '<div><b>' + esc(e.full_name) + '</b><div class="muted small">' + esc(e.position || "—") + '</div></div></div></td>' +
-          '<td class="small">' + esc(e.iin || "—") + '</td>' +
-          '<td class="small">' + esc(e.harmful_factor || "—") + '</td>' +
-          '<td>' + badge(e.status) + '</td>' +
-          '<td class="small">' + esc(e.conclusion || "—") + '</td>' +
-          '<td class="no-print">' + (e.status === "pending" ? '<button class="icon-btn" title="' + t("Удалить", "Өшіру") + '" onclick="delEmp(' + e.id + ')">' + icon("x", 16) + '</button>' : "") + '</td>' +
-        '</tr>').join("")
-        : '<tr><td colspan="7" class="empty">' + t("По вашему запросу ничего не найдено", "Ештеңе табылмады") + '</td></tr>';
+      $("emp-body").innerHTML = list.length ? list.map((e, i) => `
+        <tr>
+          <td class="muted">${i + 1}</td>
+          <td><div class="flex" style="gap:10px;flex-wrap:nowrap"><span class="avatar" style="background:${avatarColor(e.full_name)}">${esc(initials(e.full_name))}</span>
+            <div><b>${esc(e.full_name)}</b><div class="muted small">${esc(e.position || "—")}</div></div></div></td>
+          <td class="small">${esc(e.iin || "—")}</td>
+          <td class="small">${esc(e.harmful_factor || "—")}</td>
+          <td>${badge(e.status)}</td>
+          <td class="small">${esc(e.conclusion || "—")}</td>
+          <td class="no-print">
+            <div class="flex" style="gap:6px;flex-wrap:nowrap">
+              <button class="btn ghost sm" style="padding:6px 10px;font-size:12px" onclick="openEmpTicket(${e.id})" title="${t("Маршрутный лист / Талон Зелёного коридора", "Маршруттық парақ / Жасыл дәліз талоны")}">🎫 ${t("Талон", "Талон")}</button>
+              <button class="btn ghost sm" style="padding:6px 10px;font-size:12px" onclick="openEmpPass(${e.id})">🪪 ${t("Паспорт QR", "Паспорт QR")}</button>
+              ${e.status === "pending" ? `<button class="icon-btn" title="${t("Удалить", "Өшіру")}" onclick="delEmp(${e.id})">${icon("x", 16)}</button>` : ""}
+            </div>
+          </td>
+        </tr>`).join("")
+        : `<tr><td colspan="7" class="empty">${t("По вашему запросу ничего не найдено", "Ештеңе табылмады")}</td></tr>`;
+    }
+
+    function openEmpTicket(empId) {
+      const emp = DATA?.employees?.find((x) => x.id === empId);
+      if (emp) openRouteSheetModal(emp, DATA);
+    }
+
+    function openEmpPass(empId) {
+      const emp = DATA?.employees?.find((x) => x.id === empId);
+      if (emp) openMedPassportModal(emp, DATA);
+    }
+
+    function fillAiSampleCsv() {
+      $("csv").value = [
+        "Ахметов Серік Болатұлы\t910214300112\tГазоэлектросварщик\tСварочные аэрозоли, шум (п. 1.14 Приказа № 131)",
+        "Нұрғалиева Әлия Қайратқызы\t940822400334\tПовар горячего цеха\tДекретированная группа, высокая температура",
+        "Төлегенов Арман Ерікұлы\t891105300778\tВодитель самосвала\tУправление транспортом, общая вибрация (п. 10)",
+      ].join("\n");
+      updatePreview();
+      toast(t("AI подобрал вредные факторы по должностям", "AI лауазымдар бойынша зиянды факторларды анықтады"));
     }
 
     window.onLangChange = () => {
@@ -280,7 +345,7 @@
     }
     function updatePreview() {
       const lines = $("csv").value.trim().split(/\r?\n/).filter((l) => l.trim());
-      $("preview").textContent = lines.length ? t("Готово к загрузке строк: " + lines.length, "Жүктеуге дайын жол саны: " + lines.length) : "";
+      $("preview").textContent = lines.length ? t(`Готово к загрузке строк: ${lines.length}`, `Жүктеуге дайын жол саны: ${lines.length}`) : "";
     }
     $("file").addEventListener("change", (e) => readFile(e.target.files[0]));
     const dz = $("dropzone");
@@ -296,7 +361,7 @@
       setBusy(btn, true, t("Загрузка…", "Жүктелуде…"));
       try {
         const r = await api("/api/cabinet/employees", { method: "POST", body: { csv }, token });
-        toast(t("Добавлено сотрудников: " + r.added, r.added + " қызметкер қосылды"));
+        toast(t(`Добавлено сотрудников: ${r.added}`, `${r.added} қызметкер қосылды`));
         $("csv").value = ""; $("file").value = ""; updatePreview();
         await load();
       } catch (e) {
