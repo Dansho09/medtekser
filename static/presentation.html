@@ -1,13 +1,127 @@
 <!doctype html>
-<html lang="kk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#071d1b"><meta name="description" content="MedTekser жобасының презентациясы"><title>MedTekser — жоба презентациясы</title><style>
-:root{--bg:#071d1b;--panel:#102c28;--panel2:#143833;--mint:#8bf0c8;--lime:#cbf779;--white:#f3faf6;--muted:#b2c8c0;--line:#ffffff1d;--coral:#ff8068}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#1d5549 0,transparent 50%),var(--bg);color:var(--white);font:16px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}.wrap{max-width:1320px;margin:auto;padding:22px 28px 30px}.bar{height:48px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.brand{display:flex;gap:11px;align-items:center;color:var(--white);text-decoration:none;font-weight:750}.mark{width:34px;height:34px;border-radius:11px;background:var(--mint);color:#09251e;display:grid;place-items:center;font-weight:900}.bar small{color:var(--muted);letter-spacing:.12em;text-transform:uppercase;font-size:11px}.screen{position:relative;overflow:hidden;aspect-ratio:16/9;min-height:450px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(135deg,#102d29 0%,#0b2421 64%,#0a201e 100%);box-shadow:0 30px 100px #0006}.screen:before{content:"";position:absolute;width:510px;height:510px;border-radius:50%;right:-130px;top:-220px;background:radial-gradient(circle,#8bf0c81f,transparent 68%);pointer-events:none}.slide{display:none;position:absolute;inset:0;padding:6.5% 7%;grid-template-rows:auto 1fr auto;gap:24px}.slide.on{display:grid}.kicker{display:flex;gap:10px;align-items:center;color:var(--mint);font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700}.kicker:before{content:"";width:22px;height:2px;background:var(--mint)}h1,h2,p{margin:0}h1{font-size:clamp(42px,6vw,78px);line-height:.99;letter-spacing:-.055em;max-width:720px}h2{font-size:clamp(32px,4vw,52px);line-height:1.04;letter-spacing:-.04em;max-width:900px}.lead{margin-top:22px;color:var(--muted);font-size:clamp(17px,2vw,23px);max-width:640px;line-height:1.55}.cover{grid-template-columns:1.1fr .9fr;align-items:center}.cover .copy{display:grid;gap:25px}.pill{width:max-content;border:1px solid #8bf0c855;border-radius:99px;color:var(--mint);padding:7px 12px;font-size:12px}.visual{position:relative;height:100%;display:grid;place-items:center}.orbit{position:relative;width:min(100%,420px);aspect-ratio:1;border:1px solid #8bf0c833;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#8bf0c812,transparent 68%)}.orbit:before,.orbit:after{content:"";position:absolute;inset:12%;border:1px solid #8bf0c822;border-radius:50%}.orbit:after{inset:25%}.hub{z-index:1;width:145px;height:145px;border-radius:34px;display:grid;place-items:center;background:linear-gradient(145deg,#c9ffdc,#72dfb9);color:#09241f;text-align:center;font-weight:850;font-size:23px;box-shadow:0 0 60px #8bf0c833}.node{position:absolute;z-index:2;width:106px;height:76px;padding:11px;border:1px solid #8bf0c844;border-radius:16px;background:#112f2c;display:grid;place-content:center;text-align:center;font-size:12px;color:var(--white);box-shadow:0 10px 30px #0004}.n1{top:2%;left:38%}.n2{right:-1%;top:42%}.n3{bottom:3%;left:38%}.n4{left:-1%;top:42%}.cards{display:grid;gap:14px;align-content:center}.cols2{grid-template-columns:repeat(2,minmax(0,1fr))}.cols3{grid-template-columns:repeat(3,minmax(0,1fr))}.cols4{grid-template-columns:repeat(4,minmax(0,1fr))}.card{min-height:152px;padding:22px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,#ffffff0b,#ffffff04);display:flex;flex-direction:column;gap:12px}.card .icon{font-size:24px;color:var(--mint)}.card b{font-size:18px}.card p{color:var(--muted);font-size:14px;line-height:1.5}.step{min-height:185px}.num{font-size:12px;color:var(--mint);font-weight:800;letter-spacing:.12em}.quote{align-self:center;border-left:3px solid var(--mint);padding:3px 0 3px 18px;color:var(--muted);font-size:15px;max-width:900px}.status{display:inline-flex;align-items:center;gap:9px;color:var(--lime);font-weight:700}.status:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 14px var(--lime)}.road{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-self:center}.road .card{min-height:190px}.foot{display:flex;align-items:center;justify-content:space-between;color:#a9c0b8;font-size:12px}.foot strong{color:var(--mint);font-weight:650}.controls{display:grid;grid-template-columns:1fr minmax(100px,340px) 1fr;gap:16px;align-items:center;margin-top:18px}.group{display:flex;align-items:center;gap:10px}.group:last-child{justify-content:flex-end}button{border:1px solid var(--line);background:#12332e;color:var(--white);border-radius:11px;padding:0 16px;height:44px;font:inherit;cursor:pointer}button:hover{border-color:var(--mint)}button:focus-visible{outline:3px solid var(--lime);outline-offset:3px}.counter{text-align:center;color:var(--muted);font-variant-numeric:tabular-nums}.track{height:3px;background:#ffffff20;border-radius:9px;overflow:hidden}.fill{height:100%;width:12.5%;background:linear-gradient(90deg,var(--mint),var(--lime));transition:width .2s}.hint{text-align:center;color:#9fb8af;font-size:12px;margin-top:12px}.hint kbd{border:1px solid var(--line);border-radius:5px;padding:2px 6px;color:var(--white)}@media(max-width:760px){.wrap{padding:12px}.bar{margin-bottom:8px}.bar small{font-size:9px}.screen{min-height:0;border-radius:15px}.slide{padding:6%;gap:12px}.cover{grid-template-columns:1fr}.cover .copy{gap:12px}.cover .visual{display:none}.lead{margin-top:12px;font-size:15px}.cols3,.cols4{grid-template-columns:repeat(2,minmax(0,1fr))}.card{min-height:0;padding:14px;gap:7px}.card b{font-size:14px}.card p{font-size:12px}.card .icon{font-size:19px}.step{min-height:125px}.road{grid-template-columns:1fr;gap:8px}.road .card{min-height:0}.controls{grid-template-columns:auto 1fr auto;gap:7px;margin-top:11px}.group{gap:5px}.group button{padding:0 9px;font-size:12px}.group:last-child button:first-child{display:none}.hint{font-size:10px}.foot{font-size:10px}h2{font-size:clamp(25px,6vw,38px)}.kicker{font-size:9px}}@media(max-width:430px){.screen{aspect-ratio:4/5}.slide{padding:7%;gap:14px}.cover{grid-template-columns:1fr}.cols2,.cols3,.cols4{grid-template-columns:1fr}.cols4 .card:nth-child(n+3){display:none}.cols3 .card:nth-child(n+3){display:none}.cols2 .card{padding:11px}.card{min-height:auto}.step{min-height:auto}.road .card{padding:12px}.hint{display:none}}@media print{@page{size:landscape;margin:0}body{background:white}.wrap{max-width:none;padding:0}.bar,.controls,.hint{display:none!important}.screen{border:0;border-radius:0;box-shadow:none;aspect-ratio:16/9;overflow:visible}.slide,.slide.on{display:grid!important;position:relative;width:100%;height:100vh;break-after:page;page-break-after:always}}
-</style></head><body><main class="wrap"><header class="bar"><a class="brand" href="./index.html"><span class="mark">M</span><span>MedTekser</span></a><small>Жоба таныстырылымы · Шымкент</small></header><section class="screen" id="screen" aria-label="MedTekser презентациясы">
-<article class="slide cover on"><div class="copy"><span class="pill">Цифрлық медициналық сервис · 2026</span><div><div class="kicker">Корпоративтік денсаулық</div><h1>Медтексеруді<br><span style="color:var(--mint)">бірізді</span> ұйымдастыру</h1><p class="lead">Компания қызметкерлерінің медициналық тексеруін жоспарлау мен бақылауға арналған бір терезе.</p></div><div class="foot"><strong>MedTekser</strong><span>Жоба авторы · Маззахан Данияр Махсұтұлы</span></div></div><div class="visual"><div class="orbit"><div class="hub">Med<br>Tekser</div><div class="node n1">Компания<br>өтінімі</div><div class="node n2">Клиника<br>кестесі</div><div class="node n3">Қызметкер<br>мәртебесі</div><div class="node n4">Бақылау<br>панелі</div></div></div></article>
-<article class="slide"><div><div class="kicker">01 · Мәселе</div><h2>Медтексеруді ұйымдастыруда ақпарат бірнеше жерде қалады</h2></div><div class="cards cols3"><div class="card"><span class="icon">↗</span><b>Қолмен үйлестіру</b><p>Компания, қызметкер және клиника арасындағы кесте мен тізімдер бөлек жүргізілуі мүмкін.</p></div><div class="card"><span class="icon">◷</span><b>Көрінуі шектеулі</b><p>Тексерудің қай сатыда екенін жинақтап көру және жаңарту уақыт алады.</p></div><div class="card"><span class="icon">▤</span><b>Қайталанатын жұмыс</b><p>Өтінім, қызметкерлер тізімі мен қорытындыны қайта енгізу қателік тәуекелін арттырады.</p></div></div><div class="foot"><span>Мәселе · процесті үйлестіру және мәртебені бақылау</span><strong>MedTekser</strong></div></article>
-<article class="slide"><div><div class="kicker">02 · Шешім</div><h2>Өтінімнен бастап нәтижеге дейінгі жұмыс бір ағымда</h2><p class="lead">MedTekser компанияға тексеру сұрауын рәсімдеуге, қызметкерлерді тіркеуге және барысын бақылауға көмектеседі.</p></div><div class="cards cols3"><div class="card"><span class="icon">01</span><b>Өтінім қабылдау</b><p>Қызмет түрі, қызметкерлер саны және байланыс деректерін бір формада жинау.</p></div><div class="card"><span class="icon">02</span><b>Кестені үйлестіру</b><p>Оператор өтінімге клиника мен тексеру күнін бекітеді.</p></div><div class="card"><span class="icon">03</span><b>Нәтижені бақылау</b><p>Компания кабинетінен тізім мен қызметкерлердің мәртебесін қарау.</p></div></div><div class="foot"><span>Бір өтінім · ортақ жұмыс кеңістігі</span><strong>02 / 08</strong></div></article>
-<article class="slide"><div><div class="kicker">03 · Қолдану жолы</div><h2>Төрт қадаммен қарапайым жұмыс тәртібі</h2></div><div class="cards cols4"><div class="card step"><span class="num">ҚАДАМ 01</span><b>Компания деректерін енгізеді</b><p>Қызмет түрі, саны және қалаған мерзім.</p></div><div class="card step"><span class="num">ҚАДАМ 02</span><b>Өтінім тіркеледі</b><p>Алдын ала есеп және кабинетке кіру деректері көрсетіледі.</p></div><div class="card step"><span class="num">ҚАДАМ 03</span><b>Клиника мен күн белгіленеді</b><p>Оператор ұйымдастыру мәліметін нақтылайды.</p></div><div class="card step"><span class="num">ҚАДАМ 04</span><b>Мәртебе жаңартылады</b><p>Тізім бойынша барысын қарап, есепті жүктеуге болады.</p></div></div><div class="foot"><span>Компания → оператор → клиника → мәртебе</span><strong>03 / 08</strong></div></article>
-<article class="slide"><div><div class="kicker">04 · Өнім</div><h2>Қазірдің өзінде іске асқан негізгі мүмкіндіктер</h2></div><div class="cards cols3"><div class="card"><span class="icon">⌕</span><b>Қазақша және орысша интерфейс</b><p>Лендинг пен қызмет түрлері бойынша алдын ала баға калькуляторы.</p></div><div class="card"><span class="icon">▦</span><b>Компания кабинеті</b><p>Қызметкер тізімін енгізу, сүзу, мәртебе қарау және есепті басып шығару.</p></div><div class="card"><span class="icon">◈</span><b>Оператор панелі</b><p>Өтінім, клиника, күн және тексеру нәтижелері бойынша жұмыс интерфейсі.</p></div></div><p class="quote">Кодта енгізу тексерістері, CSV/Excel-мен жұмыс және хабарлама жіберуге арналған баптау қарастырылған.</p><div class="foot"><span>Негізгі интерфейстер мен API прототипінің коды бар</span><strong>04 / 08</strong></div></article>
-<article class="slide"><div><div class="kicker">05 · Бағыт</div><h2>Цифрлық сервис медициналық процесті реттеуге көмектеседі</h2></div><div class="cards cols2"><div class="card"><span class="icon">⌁</span><b>Жоба бағыты</b><p>Телемедицина және цифрлық медициналық сервистер: компания мен медициналық ұйым арасындағы тексеруді ұйымдастыру ағынын цифрландыру.</p></div><div class="card"><span class="icon">✚</span><b>Жобаның шекарасы</b><p>Сервис дәрігердің диагнозын қоймайды және медициналық шешім қабылдамайды. Ол өтінім, кесте және мәртебені үйлестіреді.</p></div></div><p class="quote">Құндылығы: ақпаратты бір арнада жинап, тексеру барысын түсініктірек ету.</p><div class="foot"><span>Медициналық қызметтің өзін клиника көрсетеді</span><strong>05 / 08</strong></div></article>
-<article class="slide"><div><div class="kicker">06 · Дайындық деңгейі</div><h2>Жұмыс істейтін MVP</h2><p class="lead"><span class="status">MVP сатысы</span></p></div><div class="cards cols2"><div class="card"><b>Дайын және көрсетіледі</b><p>Қоғамдық сайт, өтінім формасы, калькулятор, компания кабинеті және оператор интерфейсі.</p></div><div class="card"><b>Әлі расталмаған</b><p>Пилот енгізу, нақты пайдаланушылар саны және жоба табысы туралы расталған дерек жоқ.</p></div><div class="card"><b>Техникалық жағдай</b><p>API/SQLite негізіндегі сервер прототипі репозиторийде бар; GitHub Pages оны іске қоспайды.</p></div><div class="card"><b>Келесі техникалық жұмыс</b><p>API-ды бөлек хостқа шығарып, тест деректерімен толық ағынды тексеру керек.</p></div></div><div class="foot"><span>Мәртебе нақты іске асқан мүмкіндіктерге сүйенеді</span><strong>06 / 08</strong></div></article>
-<article class="slide"><div><div class="kicker">07 · Келесі кезең</div><h2>Пилотқа шығудың үш нақты қадамы</h2><p class="lead">Алдымен қауіпсіз техникалық ағынды аяқтап, содан кейін Шымкенттегі клиника және компаниялармен сынақтан өткізу.</p></div><div class="road"><div class="card"><span class="num">01 · ТЕХНИКА</span><b>API-ды орналастыру</b><p>Хостинг пен тұрақты дерекқорды қосып, өтінім жіберуді тексеру.</p></div><div class="card"><span class="num">02 · ПИЛОТ</span><b>Серіктес табу</b><p>Клиника және шағын компаниямен келісілген пилот сценарийін өткізу.</p></div><div class="card"><span class="num">03 · ӨСУ</span><b>Өлшеп жақсарту</b><p>Қатысушылар пікірін, өңдеу уақытын және мәртебе дәлдігін бақылау.</p></div></div><div class="foot"><span><a style="color:var(--mint)" href="./index.html">Өнім сайтын ашу ↗</a> · <a style="color:var(--mint)" href="https://github.com/Dansho09/medtekser">GitHub репозиторийі ↗</a></span><strong>08 / 08</strong></div></article>
-</section><nav class="controls" aria-label="Слайд басқаруы"><div class="group"><button id="prev" aria-label="Алдыңғы">← Алдыңғы</button><span class="counter" id="count">1 / 8</span></div><div class="track"><div class="fill" id="fill"></div></div><div class="group"><button id="full">Толық экран</button><button id="next" aria-label="Келесі">Келесі →</button></div></nav><p class="hint"><kbd>←</kbd> <kbd>→</kbd> ауыстыру · <kbd>F</kbd> толық экран · PDF үшін басып шығару мәзірін қолданыңыз</p></main><script>(()=>{const s=[...document.querySelectorAll('.slide')],c=document.getElementById('count'),f=document.getElementById('fill'),box=document.getElementById('screen');let i=0;function show(n){i=(n+s.length)%s.length;s.forEach((x,j)=>x.classList.toggle('on',j===i));c.textContent=(i+1)+' / '+s.length;f.style.width=((i+1)/s.length*100)+'%';history.replaceState(null,'','#s'+(i+1))}document.getElementById('prev').onclick=()=>show(i-1);document.getElementById('next').onclick=()=>show(i+1);document.getElementById('full').onclick=()=>document.fullscreenElement?document.exitFullscreen():box.requestFullscreen?.();document.onkeydown=e=>{if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(i+1)}if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(i-1)}if(e.key.toLowerCase()==='f')document.getElementById('full').click();if(e.key==='Home')show(0);if(e.key==='End')show(s.length-1)};show(0)})();</script></body></html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#082923">
+  <meta name="description" content="MedTekser жобасының презентациясы: корпоративтік медициналық тексерулерді ұйымдастыруға арналған цифрлық сервис.">
+  <title>MedTekser — жоба презентациясы</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #f4f8f6;
+      --muted: #b9d0ca;
+      --accent: #7bdcc8;
+      --coral: #ff735c;
+      --background: #082923;
+      --panel: #103c34;
+      --line: rgba(185, 208, 202, .22);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(ellipse at 50% -15%, #164b40 0, var(--background) 58%);
+      color: var(--ink);
+      font-family: Arial, "Helvetica Neue", sans-serif;
+    }
+    .shell { width: min(1320px, 100%); margin: 0 auto; padding: 20px 28px 26px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); font-size: 17px; font-weight: 700; text-decoration: none; }
+    .brand-mark { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 9px; color: var(--background); background: var(--accent); font-size: 14px; }
+    .eyebrow { color: var(--muted); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+    .stage { overflow: hidden; width: 100%; aspect-ratio: 16 / 9; border: 1px solid var(--line); border-radius: 16px; background: #f4f8f6; box-shadow: 0 24px 80px rgba(0,0,0,.28); }
+    .slide { display: none; width: 100%; height: 100%; object-fit: contain; }
+    .slide.is-active { display: block; }
+    .controls { display: grid; grid-template-columns: 1fr minmax(120px, 300px) 1fr; align-items: center; gap: 18px; margin-top: 18px; }
+    .control-group { display: flex; align-items: center; gap: 10px; }
+    .control-group:last-child { justify-content: flex-end; }
+    button { min-height: 44px; padding: 0 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer; }
+    button:hover { border-color: var(--accent); }
+    button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    .counter { min-width: 62px; color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
+    .progress { height: 3px; overflow: hidden; border-radius: 99px; background: var(--line); }
+    .progress-fill { width: 12.5%; height: 100%; background: var(--accent); transition: width .2s ease; }
+    .hint { margin: 15px 0 0; color: var(--muted); text-align: center; font-size: 13px; }
+    .hint kbd { padding: 2px 6px; border: 1px solid var(--line); border-radius: 5px; color: var(--ink); font: inherit; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    @media (max-width: 640px) {
+      .shell { padding: 14px 12px 22px; }
+      .topbar { margin-bottom: 12px; }
+      .eyebrow { font-size: 11px; text-align: right; }
+      .stage { border-radius: 9px; }
+      .controls { grid-template-columns: auto 1fr auto; gap: 8px; margin-top: 12px; }
+      .control-group { gap: 6px; }
+      button { min-height: 42px; padding: 0 10px; font-size: 12px; }
+      .control-group:last-child button:first-child { display: none; }
+      .counter { font-size: 13px; }
+      .hint { font-size: 12px; line-height: 1.5; }
+    }
+    @media print {
+      @page { size: landscape; margin: 0; }
+      :root { color-scheme: light; }
+      body { min-height: 0; background: white; }
+      .shell { width: 100%; max-width: none; margin: 0; padding: 0; }
+      .topbar, .controls, .hint { display: none !important; }
+      .stage { width: 100%; height: 100vh; overflow: visible; border: 0; border-radius: 0; box-shadow: none; aspect-ratio: auto; background: white; }
+      .slide, .slide.is-active { display: block !important; width: 100%; height: 100vh; object-fit: contain; break-after: page; page-break-after: always; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="./index.html" aria-label="MedTekser сайтына оралу"><span class="brand-mark" aria-hidden="true">M</span><span>MedTekser</span></a>
+      <span class="eyebrow">Жоба презентациясы · Шымкент</span>
+    </header>
+    <section id="stage" class="stage" aria-label="MedTekser презентация слайдтары">
+      <img class="slide is-active" src="./presentation/slide-01.png" alt="1-слайд: MedTekser корпоративтік медтексеру сервисі" fetchpriority="high">
+      <img class="slide" src="./presentation/slide-02.png" alt="2-слайд: Өтінімге қажет деректер" loading="lazy">
+      <img class="slide" src="./presentation/slide-03.png" alt="3-слайд: Компанияға арналған өтінім беті" loading="lazy">
+      <img class="slide" src="./presentation/slide-04.png" alt="4-слайд: Өтінімнің төрт кезеңі" loading="lazy">
+      <img class="slide" src="./presentation/slide-05.png" alt="5-слайд: Сұрау қабылданатын бағыттар" loading="lazy">
+      <img class="slide" src="./presentation/slide-06.png" alt="6-слайд: Деректерге ұқыпты қарау" loading="lazy">
+      <img class="slide" src="./presentation/slide-07.png" alt="7-слайд: Жобаның қазіргі дайындық күйі" loading="lazy">
+      <img class="slide" src="./presentation/slide-08.png" alt="8-слайд: Іске қосу үшін қажет үш шешім" loading="lazy">
+    </section>
+    <nav class="controls" aria-label="Слайдтарды басқару">
+      <div class="control-group"><button id="prev" type="button" aria-label="Алдыңғы слайд">← Алдыңғы</button><span id="counter" class="counter" aria-live="polite">1 / 8</span></div>
+      <div class="progress" role="progressbar" aria-label="Презентация барысы" aria-valuemin="1" aria-valuemax="8" aria-valuenow="1"><div id="progressFill" class="progress-fill"></div></div>
+      <div class="control-group"><button id="fullscreen" type="button">Толық экран</button><button id="next" type="button" aria-label="Келесі слайд">Келесі →</button></div>
+    </nav>
+    <p class="hint"><kbd>←</kbd> <kbd>→</kbd> пернелерімен ауыстырыңыз · Толық экран үшін <kbd>F</kbd> басыңыз</p>
+  </main>
+  <script>
+    (() => {
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      const counter = document.getElementById("counter");
+      const progress = document.querySelector(".progress");
+      const progressFill = document.getElementById("progressFill");
+      const stage = document.getElementById("stage");
+      let current = Math.min(slides.length - 1, Math.max(0, Number(location.hash.slice(2)) - 1 || 0));
+      function show(index) {
+        current = (index + slides.length) % slides.length;
+        slides.forEach((slide, i) => slide.classList.toggle("is-active", i === current));
+        counter.textContent = `${current + 1} / ${slides.length}`;
+        progressFill.style.width = `${((current + 1) / slides.length) * 100}%`;
+        progress.setAttribute("aria-valuenow", String(current + 1));
+        history.replaceState(null, "", `#s${current + 1}`);
+      }
+      document.getElementById("prev").addEventListener("click", () => show(current - 1));
+      document.getElementById("next").addEventListener("click", () => show(current + 1));
+      document.getElementById("fullscreen").addEventListener("click", async () => {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else await stage.requestFullscreen?.();
+      });
+      document.addEventListener("keydown", event => {
+        if (["ArrowRight", "PageDown", " "].includes(event.key)) { event.preventDefault(); show(current + 1); }
+        if (["ArrowLeft", "PageUp"].includes(event.key)) { event.preventDefault(); show(current - 1); }
+        if (event.key.toLowerCase() === "f") document.getElementById("fullscreen").click();
+        if (event.key === "Home") show(0);
+        if (event.key === "End") show(slides.length - 1);
+      });
+      show(current);
+    })();
+  </script>
+</body>
+</html>
