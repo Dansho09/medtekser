@@ -154,110 +154,104 @@ function avatarColor(name) {
   return colors[h % colors.length];
 }
 
-// =========================================================
-// GitHub Pages / Serverless Fallback DB (localStorage)
-// Егер сайт GitHub Pages доменінде (github.io) ашылса, барлық API
-// сұраныстар браузер жадында толыққанды жұмыс істейді.
-// =========================================================
+// Local demo data is available only in a local preview. Public pages must use
+// a configured server API; browser storage is never a production database.
+const API_BASE_URL = String(window.MEDTEKSER_API_BASE_URL || "").trim().replace(/\/+$/, "");
+let PRIVACY_NOTICE_URL = String(window.MEDTEKSER_PRIVACY_NOTICE_URL || "").trim();
+const IS_LOCAL_PREVIEW = location.protocol === "file:" ||
+  ["localhost", "127.0.0.1", "::1"].includes(location.hostname);
+let USE_LOCAL_API = IS_LOCAL_PREVIEW && !API_BASE_URL;
+
+function apiIsConfigured() {
+  if (USE_LOCAL_API) return true;
+  if (!API_BASE_URL) return false;
+  try {
+    const url = new URL(API_BASE_URL);
+    return (url.protocol === "https:" || (IS_LOCAL_PREVIEW && url.protocol === "http:")) && Boolean(url.host);
+  } catch (_) {
+    return false;
+  }
+}
+
+function intakeIsConfigured() {
+  if (IS_LOCAL_PREVIEW) return true;
+  return apiIsConfigured() && privacyNoticeIsConfigured();
+}
+
+function setPrivacyNoticeUrl(url) {
+  const candidate = String(url || "").trim();
+  try {
+    PRIVACY_NOTICE_URL = new URL(candidate).protocol === "https:" ? candidate : "";
+  } catch (_) {
+    PRIVACY_NOTICE_URL = "";
+  }
+}
+
+function privacyNoticeIsConfigured() {
+  if (!PRIVACY_NOTICE_URL) return false;
+  try {
+    return new URL(PRIVACY_NOTICE_URL).protocol === "https:";
+  } catch (_) {
+    return false;
+  }
+}
+
+function apiUrl(path) {
+  if (!API_BASE_URL) return path;
+  return `${API_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+function apiUnavailableMessage() {
+  return t(
+    "Сервер заявок пока не подключён. Свяжитесь с нами в WhatsApp, чтобы передать запрос.",
+    "Өтінім сервері әлі қосылмаған. Сұрауды жіберу үшін WhatsApp арқылы хабарласыңыз."
+  );
+}
 const DEFAULT_CONFIG = {
   contact_phone: "+77787961219",
-  harmful_surcharge: 5000,
-  service_fee_percent: 10,
   exam_types: {
     periodic: {
       name: "Периодический медосмотр",
       name_ru: "Периодический медосмотр",
       name_kk: "Мерзімді медициналық тексеру",
-      price: 15000,
-      desc_ru: "Обязательный ежегодный осмотр сотрудников с вредными производственными факторами (Приказ МЗ РК № ҚР ДСМ-131/2020)",
-      desc_kk: "Зиянды өндірістік факторы бар қызметкерлерге жылына бір рет міндетті тексеру (ҚР ДСМ № 131/2020 бұйрығы)",
     },
     preliminary: {
       name: "Предварительный медосмотр (форма 075/у)",
       name_ru: "Предварительный медосмотр (форма 075/у)",
       name_kk: "Жұмысқа кірер алдындағы тексеру (075/е нысаны)",
-      price: 12000,
-      desc_ru: "Медицинское освидетельствование кандидатов при приёме на работу с выдачей официального заключения",
-      desc_kk: "Жаңа қызметкерлерді жұмысқа қабылдар алдында ресми қорытынды бере отырып тексеру",
     },
     pre_shift: {
       name: "Предсменный / предрейсовый осмотр",
       name_ru: "Предсменный / предрейсовый осмотр",
       name_kk: "Ауысым / рейс алдындағы тексеру",
-      price: 3000,
-      desc_ru: "Ежедневный допуск водителей и операторов спецтехники к смене (абонемент на месяц за 1 сотрудника)",
-      desc_kk: "Жүргізушілер мен арнайы техника операторларын күнделікті ауысымға жіберу (айына 1 адамға абонемент)",
     },
     checkup: {
       name: "Корпоративный Check-Up",
       name_ru: "Корпоративный Check-Up",
       name_kk: "Корпоративтік Check-Up",
-      price: 35000,
-      desc_ru: "Расширенная диагностика здоровья команды: анализы крови, УЗИ, ЭКГ, терапевт и узкие специалисты",
-      desc_kk: "Команда денсаулығын кеңейтілген тексеру: қан талдаулары, УДЗ, ЭКГ, терапевт және бейінді мамандар",
     },
   },
 };
 
 function loadLocalDb() {
+  if (!USE_LOCAL_API) return { clinics: [], requests: [], employees: [], sessions: {} };
   try {
     const raw = localStorage.getItem("medtekser_db_v1");
     if (raw) return JSON.parse(raw);
   } catch (_) {}
-  const initial = {
-    clinics: [
-      { id: 1, name: "«Шипагер» медициналық орталығы", address: "Шымкент, Тәуке хан даңғ. 45", phone: "+7 7252 55 10 20", license: "№ 0184920DF" },
-      { id: 2, name: "«SapaMed» клиникасы", address: "Шымкент, Байтұрсынов к. 18", phone: "+7 7252 44 20 30", license: "№ 0219401DF" },
-      { id: 3, name: "MedTekser көшпелі медбригадасы", address: "Кәсіпорын аумағына шығу", phone: "+7 778 796 12 19", license: "№ 0184920DF-M" },
-    ],
-    requests: [
-      {
-        id: 1, company: "ЖШС «Ontustik Qurylys Group»", bin: "190440012345",
-        contact_name: "Ерлан Сапарұлы", phone: "+7 701 555 44 33", email: "hr@oqg.kz",
-        employees_count: 6, exam_type: "periodic", preferred_date: "2026-11-20",
-        comment: "Көшпелі бригада таңертең сағат 09:00-де келсе жақсы болар еді",
-        status: "in_progress", clinic_id: 3, scheduled_date: "2026-11-20",
-        access_code: "DEMO12", created_at: "2026-11-11T10:00:00",
-      },
-      {
-        id: 2, company: "ЖШС «Shymkent Logistics»", bin: "210840098765",
-        contact_name: "Динара Кенжебекқызы", phone: "+7 702 777 88 99", email: "office@shymlog.kz",
-        employees_count: 25, exam_type: "pre_shift", preferred_date: "2026-11-22",
-        comment: "25 жүргізушіге ай сайынғы ауысым алдындағы тексеру",
-        status: "confirmed", clinic_id: 1, scheduled_date: "2026-11-22",
-        access_code: "LOG777", created_at: "2026-11-11T11:30:00",
-      },
-    ],
-    employees: [
-      { id: 1, request_id: 1, full_name: "Сейітов Нұрлан Асқарұлы", iin: "900101300123", position: "Электрдәнекерлеуші", harmful_factor: "Дәнекерлеу аэрозолі, шу", status: "fit", conclusion: "Годен к работе без ограничений" },
-      { id: 2, request_id: 1, full_name: "Әлиева Айгүл Серікқызы", iin: "950505400456", position: "Мұнара кранының машинисі", harmful_factor: "Биіктіктегі жұмыс", status: "fit", conclusion: "Годна к работе" },
-      { id: 3, request_id: 1, full_name: "Мұратов Дәурен Бақытұлы", iin: "880312300789", position: "Жүк көлігінің жүргізушісі", harmful_factor: "Діріл, шу", status: "fit", conclusion: "Годен к работе" },
-      { id: 4, request_id: 1, full_name: "Қасымов Бекзат Талғатұлы", iin: "921120300551", position: "Монтажшы", harmful_factor: "Биіктіктегі жұмыс, шу", status: "scheduled", conclusion: "" },
-      { id: 5, request_id: 1, full_name: "Жұмабаева Гүлнар Маратқызы", iin: "870714400219", position: "Қойма меңгерушісі", harmful_factor: "", status: "scheduled", conclusion: "" },
-      { id: 6, request_id: 1, full_name: "Оспанов Мақсат Қайратұлы", iin: "980909300882", position: "Бетоншы", harmful_factor: "Цемент шаңы, діріл", status: "pending", conclusion: "" },
-    ],
-    sessions: {},
-  };
+  const initial = { clinics: [], requests: [], employees: [], sessions: {} };
   saveLocalDb(initial);
   return initial;
 }
 
 function saveLocalDb(db) {
+  if (!USE_LOCAL_API) return;
   try { localStorage.setItem("medtekser_db_v1", JSON.stringify(db)); } catch (_) {}
-}
-
-function calcLocalPrice(examType, count, harmfulCount = 0) {
-  const et = DEFAULT_CONFIG.exam_types[examType] || DEFAULT_CONFIG.exam_types.periodic;
-  const subtotal = et.price * count + DEFAULT_CONFIG.harmful_surcharge * harmfulCount;
-  const fee = Math.round(subtotal * DEFAULT_CONFIG.service_fee_percent / 100);
-  return { per_employee: et.price, subtotal, service_fee: fee, total: subtotal + fee };
 }
 
 function enrichLocalRequest(db, r, includeEmps = false) {
   const et = DEFAULT_CONFIG.exam_types[r.exam_type] || {};
   const emps = db.employees.filter((e) => e.request_id === r.id);
-  const harmful = emps.filter((e) => (e.harmful_factor || "").trim()).length;
-  const count = Math.max(r.employees_count, emps.length);
   const progress = { pending: 0, scheduled: 0, fit: 0, unfit: 0, absent: 0 };
   emps.forEach((e) => { progress[e.status] = (progress[e.status] || 0) + 1; });
   const clinic = r.clinic_id ? db.clinics.find((c) => c.id === +r.clinic_id) || null : null;
@@ -266,7 +260,6 @@ function enrichLocalRequest(db, r, includeEmps = false) {
     exam_name: et.name || r.exam_type,
     exam_name_ru: et.name_ru || et.name,
     exam_name_kk: et.name_kk || et.name,
-    price: calcLocalPrice(r.exam_type, count, harmful),
     progress,
     employees_loaded: emps.length,
     clinic,
@@ -301,7 +294,9 @@ function localApi(path, { method = "GET", body, token } = {}) {
   if (path === "/api/requests" && method === "POST") {
     const count = Math.max(1, parseInt(body.employees_count) || 1);
     const id = db.requests.reduce((m, r) => Math.max(m, r.id), 0) + 1;
-    const access_code = Math.random().toString(16).slice(2, 8).toUpperCase();
+    const accessBytes = new Uint8Array(8);
+    crypto.getRandomValues(accessBytes);
+    const access_code = [...accessBytes].map((value) => value.toString(16).padStart(2, "0")).join("").toUpperCase();
     const row = {
       id, company: (body.company || "").trim(), bin: (body.bin || "").trim(),
       contact_name: (body.contact_name || "").trim(), phone: (body.phone || "").trim(),
@@ -312,7 +307,7 @@ function localApi(path, { method = "GET", body, token } = {}) {
     };
     db.requests.unshift(row);
     saveLocalDb(db);
-    return { id, access_code, price: calcLocalPrice(row.exam_type, count) };
+    return { id, access_code };
   }
   if (path === "/api/cabinet/login" && method === "POST") {
     const rid = parseInt(body.request_id) || 0;
@@ -353,7 +348,8 @@ function localApi(path, { method = "GET", body, token } = {}) {
     return { ok: true };
   }
   if (path === "/api/admin/login" && method === "POST") {
-    if (String(body.password || "") !== "admin123") fail(t("Неверный пароль", "Құпиясөз қате"), 401);
+    // Local browser preview only; public pages and the Python API use server auth.
+    if (!String(body.password || "").trim()) fail(t("Введите пароль", "Құпиясөзді енгізіңіз"), 401);
     const tok = "adm_" + Math.random().toString(36).slice(2);
     db.sessions[tok] = { role: "admin" };
     saveLocalDb(db);
@@ -380,14 +376,11 @@ function localApi(path, { method = "GET", body, token } = {}) {
     if (path === "/api/admin/stats" && method === "GET") {
       const items = db.requests.map((r) => enrichLocalRequest(db, r));
       const active = items.filter((i) => i.status !== "cancelled");
-      const paid = active.filter((i) => i.status !== "new");
       return {
         requests: items.length,
         new: items.filter((i) => i.status === "new").length,
         employees: active.reduce((s, i) => s + Math.max(i.employees_count, i.employees_loaded), 0),
         examined: active.reduce((s, i) => s + i.progress.fit + i.progress.unfit, 0),
-        revenue: paid.reduce((s, i) => s + i.price.total, 0),
-        service_fee: paid.reduce((s, i) => s + i.price.service_fee, 0),
       };
     }
     const parts = path.strip ? path.split("/") : path.replace(/^\/+|\/+$/g, "").split("/");
@@ -426,25 +419,27 @@ function localApi(path, { method = "GET", body, token } = {}) {
   fail("Not found", 404);
 }
 
-let USE_LOCAL_API = location.hostname.endsWith("github.io") || location.protocol === "file:";
-
 async function api(path, { method = "GET", body, token } = {}) {
   if (USE_LOCAL_API) {
     return localApi(path, { method, body, token });
+  }
+  if (!apiIsConfigured()) {
+    throw new Error(apiUnavailableMessage());
   }
   const headers = { "Content-Type": "application/json" };
   if (token) headers.Authorization = "Bearer " + token;
   let res;
   try {
-    res = await fetch(path, { method, headers, body: body ? JSON.stringify(body) : undefined });
+    res = await fetch(apiUrl(path), { method, headers, body: body ? JSON.stringify(body) : undefined });
   } catch (e) {
-    USE_LOCAL_API = true;
-    return localApi(path, { method, body, token });
+    throw new Error(t(
+      "Не удалось подключиться к серверу. Поля формы остались заполненными — попробуйте ещё раз или свяжитесь с нами в WhatsApp.",
+      "Серверге қосылу мүмкін болмады. Форма өрістері толтырылған күйде қалды — қайта көріңіз немесе WhatsApp арқылы хабарласыңыз."
+    ));
   }
   const ct = res.headers.get("Content-Type") || "";
   if ((res.status === 404 || res.status === 405) && !ct.includes("application/json")) {
-    USE_LOCAL_API = true;
-    return localApi(path, { method, body, token });
+    throw new Error(apiUnavailableMessage());
   }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
@@ -452,23 +447,37 @@ async function api(path, { method = "GET", body, token } = {}) {
     err.status = res.status;
     throw err;
   }
+  if (path === "/api/requests" && method === "POST" &&
+      (res.status !== 201 || !Number.isSafeInteger(Number(data.id)) || Number(data.id) < 1 ||
+       typeof data.access_code !== "string" || !data.access_code.trim())) {
+    throw new Error(t(
+      "Сервер не подтвердил приём заявки. Поля формы остались заполненными — попробуйте ещё раз или свяжитесь с нами в WhatsApp.",
+      "Сервер өтінімнің қабылданғанын растаған жоқ. Форма өрістері толтырылған күйде қалды — қайта көріңіз немесе WhatsApp арқылы хабарласыңыз."
+    ));
+  }
   return data;
 }
 
 async function downloadFile(path, token, filename) {
   if (!USE_LOCAL_API) {
+    if (!apiIsConfigured()) throw new Error(apiUnavailableMessage());
+    let res;
     try {
-      const res = await fetch(path, { headers: { Authorization: "Bearer " + token } });
-      if (res.ok) {
-        const blob = await res.blob();
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = filename;
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-        return;
-      }
-    } catch (_) {}
+      res = await fetch(apiUrl(path), { headers: { Authorization: "Bearer " + token } });
+    } catch (_) {
+      throw new Error(t("Не удалось подключиться к серверу", "Серверге қосылу мүмкін болмады"));
+    }
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || t("Не удалось скачать файл с сервера", "Файлды серверден жүктеу мүмкін болмады"));
+    }
+    const blob = await res.blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    return;
   }
   // Fallback CSV generation from localStorage DB
   const db = loadLocalDb();
@@ -477,7 +486,12 @@ async function downloadFile(path, token, filename) {
   db.employees.filter((e) => e.request_id === rid).forEach((e, i) => {
     rows.push([i + 1, e.full_name, e.iin, e.position, e.harmful_factor, statusLabel(e.status), e.conclusion || ""]);
   });
-  const csv = "\ufeff" + rows.map((r) => r.map((c) => `"${String(c ?? "").replace(/"/g, '""')}"`).join(";")).join("\r\n");
+  const csvCell = (value) => {
+    const text = String(value ?? "");
+    const safe = /^[\u0000-\u0020]*[=+\-@]/.test(text) ? "'" + text : text;
+    return `"${safe.replace(/"/g, '""')}"`;
+  };
+  const csv = "\ufeff" + rows.map((r) => r.map(csvCell).join(";")).join("\r\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -491,6 +505,8 @@ function toast(msg, type = "") {
   if (!wrap) {
     wrap = document.createElement("div");
     wrap.className = "toast-wrap";
+    wrap.setAttribute("aria-live", "polite");
+    wrap.setAttribute("aria-atomic", "false");
     document.body.appendChild(wrap);
   }
   const el = document.createElement("div");
@@ -558,442 +574,7 @@ function setLang(lang) {
   applyTranslations();
 }
 
-// =========================================================
-// MedTekser AI — Приказ МЗ РК № ҚР ДСМ-131/2020 сарапшысы,
-// Цифрлық Медпаспорт (QR) және Ресми Құжаттар Генераторы
-// =========================================================
-const AI_PROFESSIONS = [
-  {
-    key: "welder",
-    title_ru: "Электросварщик / Газосварщик",
-    title_kk: "Электрдәнекерлеуші / Газбен дәнекерлеуші",
-    clause: "Пункт 1.14, 4.1 Приказа МЗ РК № 131/2020",
-    factors_ru: ["Сварочные аэрозоли (марганец, кремний)", "Производственный шум >80 дБ", "УФ-излучение", "Физические перегрузки"],
-    factors_kk: ["Дәнекерлеу аэрозольдері (марганец, кремний)", "Өндірістік шу >80 дБ", "УК-сәулелену", "Физикалық жүктеме"],
-    doctors_ru: ["Профпатолог", "Терапевт", "Невропатолог", "Офтальмолог", "Отоларинголог (ЛОР)", "Дерматовенеролог", "Хирург"],
-    doctors_kk: ["Профпатолог", "Терапевт", "Невропатолог", "Офтальмолог", "Отоларинголог (ЛОР)", "Дерматовенеролог", "Хирург"],
-    tests_ru: ["Спирометрия (ФВД)", "Тональная аудиометрия", "Рентгенография легких", "ЭКГ", "ОАК + ретикулоциты", "Биометрия глаз"],
-    tests_kk: ["Спирометрия (СДФ)", "Тональды аудиометрия", "Өкпе рентгенографиясы", "ЭКГ", "ЖҚТ + ретикулоциттер", "Көз биометриясы"],
-    freq_ru: "1 раз в 12 месяцев",
-    freq_kk: "12 айда 1 рет",
-    exam_type: "periodic",
-  },
-  {
-    key: "crane",
-    title_ru: "Монтажник-высотник / Крановщик",
-    title_kk: "Биіктіктегі монтажшы / Кран машинисі",
-    clause: "Пункт 1 (Прил. 2) — Работы на высоте и верхолазные работы",
-    factors_ru: ["Работы на высоте >1.8 м", "Управление подъемными механизмами", "Повышенное напряжение зрения"],
-    factors_kk: ["1.8 м-ден жоғары биіктіктегі жұмыс", "Көтергіш механизмдерді басқару", "Көру мүшесіне жоғары жүктеме"],
-    doctors_ru: ["Профпатолог", "Терапевт", "Невропатолог", "Офтальмолог", "Отоларинголог", "Хирург", "Психиатр-нарколог"],
-    doctors_kk: ["Профпатолог", "Терапевт", "Невропатолог", "Офтальмолог", "Отоларинголог", "Хирург", "Психиатр-нарколог"],
-    tests_ru: ["Исследование вестибулярного аппарата", "Периметрия (поля зрения)", "ЭКГ", "Аудиометрия", "Глюкоза крови"],
-    tests_kk: ["Вестибулярлық аппаратты зерттеу", "Периметрия (көру өрісі)", "ЭКГ", "Аудиометрия", "Қандағы глюкоза"],
-    freq_ru: "1 раз в 12 месяцев",
-    freq_kk: "12 айда 1 рет",
-    exam_type: "periodic",
-  },
-  {
-    key: "driver",
-    title_ru: "Водитель грузового / пассажирского транспорта",
-    title_kk: "Жүк / жолаушылар көлігінің жүргізушісі",
-    clause: "Пункт 10 (Прил. 2) + Предсменное освидетельствование",
-    factors_ru: ["Управление наземным транспортом", "Общая вибрация", "Шум", "Ночные смены"],
-    factors_kk: ["Жерүсті көлігін басқару", "Жалпы діріл", "Шу", "Түнгі ауысымдар"],
-    doctors_ru: ["Терапевт", "Невропатолог", "Офтальмолог", "Отоларинголог", "Хирург", "Нарколог / Психиатр"],
-    doctors_kk: ["Терапевт", "Невропатолог", "Офтальмолог", "Отоларинголог", "Хирург", "Нарколог / Психиатр"],
-    tests_ru: ["Ежедневный предрейсовый осмотр (АД, пульс, алкотест)", "ЭКГ", "Острота и поля зрения", "Паллестезиометрия"],
-    tests_kk: ["Күнделікті рейс алдындағы тексеру (АҚ, пульс, алкотест)", "ЭКГ", "Көру өткірлігі мен өрісі", "Паллестезиометрия"],
-    freq_ru: "Ежедневно (предрейсовый) + 1 раз в год",
-    freq_kk: "Күн сайын (рейс алдында) + жылына 1 рет",
-    exam_type: "pre_shift",
-  },
-  {
-    key: "food",
-    title_ru: "Повар / Работник пищеблока и HoReCa (Санкнижка)",
-    title_kk: "Аспаз / Тамақ өнеркәсібі және HoReCa (Санкітапша)",
-    clause: "Декретированная группа населения (Приказ МЗ РК № 131/2020)",
-    factors_ru: ["Контакт с пищевыми продуктами", "Повышенная температура воздуха", "Локальные мышечные нагрузки"],
-    factors_kk: ["Тамақ өнімдерімен байланыс", "Жоғары ауа температурасы", "Жергілікті бұлшықет жүктемесі"],
-    doctors_ru: ["Терапевт", "Дерматовенеролог", "Инфекционист (по показаниям)"],
-    doctors_kk: ["Терапевт", "Дерматовенеролог", "Инфекционист (көрсетілім бойынша)"],
-    tests_ru: ["Бак. посев на кишечную группу", "Мазок на стафилококк", "Анализ на гельминтозы", "Кровь на сифилис (RW)", "Флюорография"],
-    tests_kk: ["Ішек тобына бак. себу", "Стафилококкқа жағынды", "Гельминтозға талдау", "Мерезге қан (RW)", "Флюорография"],
-    freq_ru: "1 раз в 12 месяцев (баканализы при поступлении)",
-    freq_kk: "12 айда 1 рет",
-    exam_type: "periodic",
-  },
-  {
-    key: "chem",
-    title_ru: "Оператор НПЗ / Химическое и цементное производство",
-    title_kk: "МӨЗ операторы / Химия және цемент өндірісі",
-    clause: "Пункт 1.1, 1.29, 2.4 Приказа МЗ РК № 131/2020",
-    factors_ru: ["Углеводороды нефти", "Силикатсодержащая и цементная пыль", "Производственный шум", "Химические реагенты"],
-    factors_kk: ["Мұнай көмірсутектері", "Силикатты және цемент шаңы", "Өндірістік шу", "Химиялық реагенттер"],
-    doctors_ru: ["Профпатолог", "Терапевт", "Пульмонолог / Аллерголог", "Невропатолог", "Дерматовенеролог", "Офтальмолог", "ЛОР"],
-    doctors_kk: ["Профпатолог", "Терапевт", "Пульмонолог / Аллерголог", "Невропатолог", "Дерматовенеролог", "Офтальмолог", "ЛОР"],
-    tests_ru: ["Спирометрия (ФВД)", "Рентген грудной клетки в 2 проекциях", "Печеночные пробы (АЛТ, АСТ, билирубин)", "ОАК, ОАМ", "ЭКГ"],
-    tests_kk: ["Спирометрия (СДФ)", "Кеуде қуысының рентгені", "Бауыр сынамалары (АЛТ, АСТ, билирубин)", "ЖҚТ, ЖНТ", "ЭКГ"],
-    freq_ru: "1 раз в 12 месяцев",
-    freq_kk: "12 айда 1 рет",
-    exam_type: "periodic",
-  },
-  {
-    key: "edu",
-    title_ru: "Учитель / Воспитатель детского сада / Медработник",
-    title_kk: "Мұғалім / Балабақша тәрбиешісі / Медқызметкер",
-    clause: "Декретированная группа — Образование и Здравоохранение",
-    factors_ru: ["Работа с детьми и пациентами", "Голосо-речевые нагрузки", "Биологический фактор"],
-    factors_kk: ["Балалармен және пациенттермен жұмыс", "Дауыс-сөйлеу жүктемесі", "Биологиялық фактор"],
-    doctors_ru: ["Терапевт", "Отоларинголог", "Дерматовенеролог"],
-    doctors_kk: ["Терапевт", "Отоларинголог", "Дерматовенеролог"],
-    tests_ru: ["Флюорография", "Кровь на микрореакцию (RW)", "Бактериологическое исследование", "Мазок из зева и носа"],
-    tests_kk: ["Флюорография", "Микрореакцияға қан (RW)", "Бактериологиялық зерттеу", "Тамақ пен мұрыннан жағынды"],
-    freq_ru: "1 раз в 12 месяцев",
-    freq_kk: "12 айда 1 рет",
-    exam_type: "periodic",
-  },
-];
-
-function analyzeProfession(keyOrQuery) {
-  const q = String(keyOrQuery || "").toLowerCase().trim();
-  const exact = AI_PROFESSIONS.find((p) => p.key === q);
-  if (exact) return exact;
-  if (/свар|дәнекер|газорез|слесар|токар/i.test(q)) return AI_PROFESSIONS[0];
-  if (/высот|биік|кран|монтаж|строп|электрик/i.test(q)) return AI_PROFESSIONS[1];
-  if (/водит|жүргіз|трактор|экскават|погруз|курьер/i.test(q)) return AI_PROFESSIONS[2];
-  if (/повар|аспаз|кондит|пекар|официант|кассир|продав/i.test(q)) return AI_PROFESSIONS[3];
-  if (/нефт|мұнай|цемент|бетон|хим|шахт|горн|дроб/i.test(q)) return AI_PROFESSIONS[4];
-  if (/учит|мұғал|воспит|тәрбие|врач|дәріг|медсест/i.test(q)) return AI_PROFESSIONS[5];
-  return AI_PROFESSIONS[0];
-}
-
-// Векторлық SVG QR-код генераторы (интернетсіз де жұмыс істейді)
-function svgQrCode(seedText, size = 84) {
-  const n = 21;
-  const grid = Array.from({ length: n }, () => Array(n).fill(0));
-  const finder = (r0, c0) => {
-    for (let r = 0; r < 7; r++) for (let c = 0; c < 7; c++) {
-      grid[r0 + r][c0 + c] = (r === 0 || r === 6 || c === 0 || c === 6 || (r >= 2 && r <= 4 && c >= 2 && c <= 4)) ? 1 : 0;
-    }
-  };
-  finder(0, 0); finder(0, n - 7); finder(n - 7, 0);
-  let h = 2166136261;
-  for (const ch of String(seedText || "MEDTEKSER")) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
-  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
-    if ((r < 8 && c < 8) || (r < 8 && c >= n - 8) || (r >= n - 8 && c < 8)) continue;
-    h = Math.imul(h ^ ((r * 31) + c), 1664525) + 1013904223 >>> 0;
-    grid[r][c] = (h >>> 16) & 1;
-  }
-  let rects = "";
-  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
-    if (grid[r][c]) rects += `<rect x="${c}" y="${r}" width="1" height="1"/>`;
-  }
-  return `<svg width="${size}" height="${size}" viewBox="0 0 ${n} ${n}" fill="#0b1716" shape-rendering="crispEdges" aria-label="QR">${rects}</svg>`;
-}
-
-function closeAnyModal() {
-  document.querySelectorAll(".modal-backdrop").forEach((m) => m.remove());
-}
-
-// Цифрлық Медициналық Паспорт (Digital MedPass № 075/у & Приказ № 131)
-function openMedPassportModal(emp, req) {
-  closeAnyModal();
-  const prof = analyzeProfession((emp.position || "") + " " + (emp.harmful_factor || ""));
-  const docs = LANG === "kk" ? prof.doctors_kk : prof.doctors_ru;
-  const tests = LANG === "kk" ? prof.tests_kk : prof.tests_ru;
-  const isFit = emp.status === "fit";
-  const isUnfit = emp.status === "unfit";
-  const passId = `MT-2026-${String(req?.id || 1).padStart(3, "0")}-${String(emp.id || 1).padStart(4, "0")}`;
-  const qr = svgQrCode(passId + "|" + (emp.iin || "") + "|" + emp.status, 84);
-  const clinicName = req?.clinic?.name || "МЦ «Шипагер» (Лиц. № 0184920DF)";
-
-  const wrap = document.createElement("div");
-  wrap.className = "modal-backdrop";
-  wrap.addEventListener("click", (e) => { if (e.target === wrap) closeAnyModal(); });
-  wrap.innerHTML = `
-    <div class="modal-box">
-      <div class="modal-head">
-        <div>
-          <span class="muted small">${t("Цифровой медицинский паспорт · Форма № 075/у & Приказ № 131", "Цифрлық медициналық паспорт · № 075/е нысаны және № 131 бұйрық")}</span>
-          <h3>${esc(emp.full_name)}</h3>
-        </div>
-        <button class="icon-btn" onclick="closeAnyModal()" title="Закрыть">${icon("x", 18)}</button>
-      </div>
-      <div class="modal-body">
-        <div class="medpass-top">
-          <div>
-            <div style="margin-bottom:8px">${badge(emp.status)} <span class="muted small" style="margin-left:8px">ID: <b>${passId}</b></span></div>
-            <div style="font-size:14.5px">
-              <b>${t("Компания:", "Компания:")}</b> ${esc(req?.company || "—")}<br/>
-              <b>${t("ИИН:", "ЖСН:")}</b> ${esc(emp.iin || "—")} · <b>${t("Должность:", "Лауазымы:")}</b> ${esc(emp.position || "—")}<br/>
-              <b>${t("Вредные факторы:", "Зиянды факторлар:")}</b> ${esc(emp.harmful_factor || (LANG === "kk" ? prof.factors_kk.join(", ") : prof.factors_ru.join(", ")))}<br/>
-              <b>${t("Медорганизация:", "Медұйым:")}</b> ${esc(clinicName)}
-            </div>
-          </div>
-          <div class="qr-box">
-            ${qr}
-            <span style="font-size:9px;font-weight:700;color:var(--muted);margin-top:2px">QR-VERIFIED</span>
-          </div>
-        </div>
-
-        <h4 style="margin:0 0 8px">${t("Врачебная комиссия", "Дәрігерлік комиссия")} (${prof.clause})</h4>
-        <div class="doc-grid">
-          ${docs.map((d) => `
-            <div class="doc-item">
-              <span>${esc(d)}</span>
-              ${isFit ? `<span class="badge fit">${t("Патологий нет", "Патология жоқ")}</span>`
-                      : isUnfit ? `<span class="badge unfit">${t("Противопоказание", "Қарсы көрсетілім")}</span>`
-                                : `<span class="badge scheduled">${t("По графику", "Кесте бойынша")}</span>`}
-            </div>`).join("")}
-        </div>
-
-        <h4 style="margin:16px 0 8px">${t("Лабораторные и функциональные исследования", "Зертханалық және функционалдық зерттеулер")}</h4>
-        <div class="doc-grid">
-          ${tests.map((ts) => `
-            <div class="doc-item">
-              <span>${esc(ts)}</span>
-              <b style="color:${isFit ? "var(--ok)" : "var(--muted)"}">${isFit ? "✓ Норма" : "—"}</b>
-            </div>`).join("")}
-        </div>
-
-        <div style="margin-top:18px;padding:16px;background:var(--bg);border-radius:14px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
-          <div style="max-width:480px">
-            <div class="muted small">${t("Итоговое медицинское заключение профпатолога", "Профпатологтың қорытынды медициналық шешімі")}</div>
-            <b style="font-size:16px">${esc(emp.conclusion || (isFit ? t("Годен к работе в указанных производственных условиях без ограничений.", "Көрсетілген өндірістік жағдайларда шектеусіз жұмысқа жарамды.") : t("Осмотр в процессе прохождения.", "Тексеру өту барысында.")))}</b>
-            <div class="muted small" style="margin-top:4px">${t("AI-индекс здоровья:", "AI денсаулық индексі:")} <b style="color:var(--brand-700)">${isFit ? "94/100 (Низкий проф. риск)" : "Ожидает данных"}</b></div>
-          </div>
-          ${isFit ? `<div class="stamp-seal"><span>MedTekser Verified</span><b style="font-size:12px;margin:3px 0">${t("ГОДЕН", "ЖАРАМДЫ")}</b><span>ЭЦП / QR</span></div>` : ""}
-        </div>
-      </div>
-      <div class="modal-foot">
-        <span class="muted small">${t("Документ сформирован автоматически в соответствии с Приказом МЗ РК № ҚР ДСМ-131/2020", "Құжат ҚР ДСМ № 131/2020 бұйрығына сәйкес автоматты түрде жасалды")}</span>
-        <div class="flex">
-          <button class="btn ghost sm" onclick="closeAnyModal()">${t("Закрыть", "Жабу")}</button>
-          <button class="btn sm" onclick="window.print()">${icon("printer", 16)} ${t("Печать паспорта (075/у)", "Паспортты басып шығару")}</button>
-        </div>
-      </div>
-    </div>`;
-  document.body.appendChild(wrap);
-}
-
-// Ресми Коммерциялық Ұсыныс / Шот на оплату / Қорытынды Акт генераторы
-function openOfficialDocModal(type, data) {
-  closeAnyModal();
-  const docNo = `MT-${new Date().getFullYear()}-${String(data.id || 101).padStart(4, "0")}`;
-  const qr = svgQrCode(docNo + "|" + (data.company || "") + "|" + (data.price?.total || 0), 80);
-  const isAct = type === "act";
-  const title = isAct
-    ? t("ЗАКЛЮЧИТЕЛЬНЫЙ АКТ МЕДИЦИНСКОЙ КОМИССИИ", "МЕДИЦИНАЛЫҚ КОМИССИЯНЫҢ ҚОРЫТЫНДЫ АКТІСІ")
-    : t("КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ И СЧЁТ НА ОПЛАТУ", "КОММЕРЦИЯЛЫҚ ҰСЫНЫС ЖӘНЕ ТӨЛЕМ ШОТЫ");
-
-  const wrap = document.createElement("div");
-  wrap.className = "modal-backdrop";
-  wrap.addEventListener("click", (e) => { if (e.target === wrap) closeAnyModal(); });
-  wrap.innerHTML = `
-    <div class="modal-box">
-      <div class="modal-head">
-        <div>
-          <span class="muted small">MedTekser Document Engine · № ${docNo}</span>
-          <h3>${title}</h3>
-        </div>
-        <button class="icon-btn" onclick="closeAnyModal()">${icon("x", 18)}</button>
-      </div>
-      <div class="modal-body">
-        <div class="medpass-top">
-          <div>
-            <div style="font-weight:800;font-size:18px;color:var(--brand-800)">ТОО «MedTekser Digital Health» · г. Шымкент</div>
-            <div class="small muted">${t("БИН: 240540019283 · ИИК: KZ48722S000019283746 в АО «Kaspi Bank» · КБе 17", "БСН: 240540019283 · ЖСК: KZ48722S000019283746 «Kaspi Bank» АҚ · КБе 17")}</div>
-            <div style="margin-top:8px;font-size:14.5px">
-              <b>${t("Заказчик:", "Тапсырыс беруші:")}</b> ${esc(data.company || "Корпоративный клиент")} ${data.bin ? `(${t("БИН", "БСН")} ${esc(data.bin)})` : ""}<br/>
-              <b>${t("Вид услуги:", "Қызмет түрі:")}</b> ${esc(examName(data))}
-            </div>
-          </div>
-          <div class="qr-box">${qr}</div>
-        </div>
-
-        ${isAct ? `
-          <p class="small">${t(
-            "Настоящий Заключительный акт составлен врачебной комиссией по результатам обязательного медицинского осмотра работников предприятия в соответствии с Приказом МЗ РК № ҚР ДСМ-131/2020.",
-            "Осы Қорытынды акт ҚР ДСМ № 131/2020 бұйрығына сәйкес кәсіпорын қызметкерлерін міндетті медициналық тексеру нәтижелері бойынша жасалды."
-          )}</p>
-          <div class="doc-grid">
-            <div class="doc-item"><span>${t("Подлежало осмотру:", "Тексеруге жататыны:")}</span><b>${data.employees_count} ${t("чел.", "адам")}</b></div>
-            <div class="doc-item"><span>${t("Фактически осмотрено:", "Нақты тексерілгені:")}</span><b>${(data.progress?.fit || 0) + (data.progress?.unfit || 0)} ${t("чел.", "адам")}</b></div>
-            <div class="doc-item"><span>${t("Признаны годными:", "Жарамды деп танылды:")}</span><b style="color:var(--ok)">${data.progress?.fit || 0} ${t("чел.", "адам")}</b></div>
-            <div class="doc-item"><span>${t("Выявлены противопоказания:", "Қарсы көрсетілім анықталды:")}</span><b style="color:var(--bad)">${data.progress?.unfit || 0} ${t("чел.", "адам")}</b></div>
-          </div>
-        ` : `
-          <table style="margin:12px 0;border:1px solid var(--line)">
-            <thead>
-              <tr>
-                <th>${t("Наименование услуги", "Қызмет атауы")}</th>
-                <th>${t("Кол-во", "Саны")}</th>
-                <th>${t("Цена за 1 чел.", "1 адамға бағасы")}</th>
-                <th>${t("Сумма", "Сомасы")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><b>${esc(examName(data))}</b><div class="muted small">${t("Проведение медкомиссии, лабораторные анализы, ЭКГ, флюорография", "Медкомиссия, зертханалық талдаулар, ЭКГ, флюорография")}</div></td>
-                <td>${data.employees_count}</td>
-                <td>${fmtMoney(data.price?.per_employee || 15000)}</td>
-                <td><b>${fmtMoney(data.price?.subtotal || 0)}</b></td>
-              </tr>
-              <tr>
-                <td><b>${t("Цифровое сопровождение MedTekser (10%)", "MedTekser цифрлық сүйемелдеуі (10%)")}</b><div class="muted small">${t("Личный кабинет HR, электронные паспорта 075/у, сводный акт", "HR жеке кабинеті, 075/е электронды паспорттар, қорытынды акт")}</div></td>
-                <td>1</td>
-                <td>—</td>
-                <td><b>${fmtMoney(data.price?.service_fee || 0)}</b></td>
-              </tr>
-            </tbody>
-          </table>
-          <div style="text-align:right;font-size:22px;font-weight:800;color:var(--brand-800);margin-top:12px">
-            ${t("ИТОГО К ОПЛАТЕ:", "БАРЛЫҒЫ ТӨЛЕУГЕ:")} ${fmtMoney(data.price?.total || 0)}
-          </div>
-        `}
-
-        <div style="margin-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px">
-          <div class="small muted">
-            <b>${t("Оператор платформы:", "Платформа операторы:")}</b> MedTekser · Шымкент<br/>
-            <b>${t("Телефон / WhatsApp:", "Телефон / WhatsApp:")}</b> +7 (778) 796-12-19
-          </div>
-          <div class="stamp-seal"><span>MedTekser KZ</span><b style="font-size:11px;margin:3px 0">${isAct ? t("АКТ УТВЕРЖДЁН", "АКТ БЕКІТІЛДІ") : t("ДЛЯ ОПЛАТЫ", "ТӨЛЕМ ҮШІН")}</b><span>№ ${docNo}</span></div>
-        </div>
-      </div>
-      <div class="modal-foot">
-        <span class="muted small">${t("Нажмите «Печать / Сохранить PDF», чтобы скачать официальный бланк", "Ресми бланкті жүктеу үшін «Басып шығару / PDF сақтау» басыңыз")}</span>
-        <div class="flex">
-          <button class="btn ghost sm" onclick="closeAnyModal()">${t("Закрыть", "Жабу")}</button>
-          <button class="btn sm" onclick="window.print()">${icon("printer", 16)} ${t("Печать / Сохранить PDF", "Басып шығару / PDF сақтау")}</button>
-        </div>
-      </div>
-    </div>`;
-  document.body.appendChild(wrap);
-}
-
-// Қызметкердің Маршруттық парағы / «Жасыл дәліз» электронды талоны
-function openRouteSheetModal(emp, req) {
-  closeAnyModal();
-  const ticketNo = `GC-${String(req?.id || 1).padStart(2, "0")}-${String(emp?.id || 1).padStart(3, "0")}`;
-  const clinicName = req?.clinic?.name || "ТОО «Shymkent MedCenter Pro»";
-  const clinicAddr = req?.clinic?.address || "г. Шымкент, пр. Тауке хана, 45";
-  const schedDate = req?.scheduled_date || "2026-03-18";
-  const qr = svgQrCode(`MEDTEKSER-TICKET|${ticketNo}|${emp?.iin || ""}|${clinicName}`, 88);
-
-  const waMsg = encodeURIComponent(
-    t(
-      `Здравствуйте, ${emp?.full_name || ""}! Вы записаны на корпоративный медосмотр через платформу MedTekser (Зелёный коридор без очереди).\n📅 Дата: ${schedDate} (08:30–10:30)\n🏥 Клиника: ${clinicName} (${clinicAddr})\n🎫 Талон: ${ticketNo}\nПри себе иметь удостоверение личности.`,
-      `Сәлеметсіз бе, ${emp?.full_name || ""}! Сіз MedTekser платформасы арқылы кезексіз корпоративтік медтексеруге жазылдыңыз.\n📅 Күні: ${schedDate} (08:30–10:30)\n🏥 Клиника: ${clinicName} (${clinicAddr})\n🎫 Талон: ${ticketNo}\nӨзіңізбен жеке куәлік ала келіңіз.`
-    )
-  );
-
-  const wrap = document.createElement("div");
-  wrap.className = "modal-backdrop";
-  wrap.addEventListener("click", (e) => { if (e.target === wrap) closeAnyModal(); });
-  wrap.innerHTML = `
-    <div class="modal-box">
-      <div class="modal-head">
-        <div class="flex">
-          <span class="badge scheduled">🎫 ${t("ЗЕЛЁНЫЙ КОРИДОР · ТАЛОН", "ЖАСЫЛ ДӘЛІЗ · ТАЛОН")} № ${ticketNo}</span>
-          <h3>${t("Маршрутный лист медосмотра (45 минут)", "Медтексерудің маршруттық парағы (45 минут)")}</h3>
-        </div>
-        <button class="icon-btn" onclick="closeAnyModal()">${icon("x", 18)}</button>
-      </div>
-      <div class="modal-body">
-        <div class="medpass-top">
-          <div>
-            <div style="font-size:19px;font-weight:800;margin-bottom:4px">${esc(emp?.full_name || "Әбдірахманов Нұрлан Серікұлы")}</div>
-            <div class="small muted">${t("ИИН:", "ЖСН:")} <b>${esc(emp?.iin || "900315300145")}</b> · ${t("Должность:", "Лауазымы:")} <b>${esc(emp?.position || "Специалист")}</b></div>
-            <div class="small" style="margin-top:6px">
-              <b>${t("Предприятие:", "Кәсіпорын:")}</b> ${esc(req?.company || "ЖШС «Ontustik Qurylys Group»")}<br/>
-              <b>${t("Медцентр:", "Медорталық:")}</b> ${esc(clinicName)} (${esc(clinicAddr)})<br/>
-              <b>${t("Дата и время VIP-окна:", "VIP-уақыт терезесі:")}</b> <span style="color:var(--brand-700);font-weight:800">${esc(schedDate)} · 08:30 – 09:30</span>
-            </div>
-          </div>
-          <div class="qr-box">
-            ${qr}
-            <div style="font-size:9px;font-weight:700;color:var(--muted);margin-top:2px">FAST-TRACK QR</div>
-          </div>
-        </div>
-
-        <div class="small muted" style="font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">
-          ${t("Пошаговый маршрут по кабинетам (без общей очереди):", "Кабинеттер бойынша кезексіз маршрут:")}
-        </div>
-        <div class="route-steps">
-          <div class="route-step">
-            <span class="route-room">Каб. 101</span>
-            <div><b>${t("Стойка MedTekser Fast-Track (Регистратура B2B)", "MedTekser Fast-Track тіркеу орны")}</b><div class="muted small">${t("Сканирование QR-талона по удостоверению личности", "Жеке куәлік пен QR-талонды сканерлеу")}</div></div>
-            <span class="badge confirmed">08:30 (3 мин)</span>
-          </div>
-          <div class="route-step">
-            <span class="route-room">Каб. 104</span>
-            <div><b>${t("Процедурный кабинет + ЭКГ", "Емшара кабинеті + ЭКГ")}</b><div class="muted small">${t("Забор крови (ОАК, биохимия), ОАМ, электрокардиография", "Қан тапсыру, ЖҚТ, электрокардиография")}</div></div>
-            <span class="badge confirmed">08:35 (12 мин)</span>
-          </div>
-          <div class="route-step">
-            <span class="route-room">Каб. 108</span>
-            <div><b>${t("Цифровая флюорография и Аудиометрия / Спирометрия", "Цифрлық флюорография және Аудиометрия")}</b><div class="muted small">${t("Мгновенный снимок грудной клетки в 2 проекциях", "Кеуде қуысының лездік цифрлық рентгені")}</div></div>
-            <span class="badge confirmed">08:50 (10 мин)</span>
-          </div>
-          <div class="route-step">
-            <span class="route-room">Каб. 204</span>
-            <div><b>${t("Врачебная комиссия + Заключение Профпатолога", "Дәрігерлік комиссия + Кәсіптік патолог қорытындысы")}</b><div class="muted small">${t("Терапевт, Невропатолог, Офтальмолог, ЛОР, Хирург → Выпуск QR 075/у", "Мамандар тексеруі → QR 075/у паспортын шығару")}</div></div>
-            <span class="badge fit">09:00 (20 мин)</span>
-          </div>
-        </div>
-      </div>
-      <div class="modal-foot">
-        <a class="btn ghost sm" target="_blank" rel="noopener" href="https://wa.me/77787961219?text=${waMsg}">
-          ${icon("whatsapp", 16)} ${t("Отправить талон в WhatsApp", "Талонды WhatsApp-қа жіберу")}
-        </a>
-        <div class="flex">
-          <button class="btn ghost sm" onclick="closeAnyModal()">${t("Закрыть", "Жабу")}</button>
-          <button class="btn sm" onclick="window.print()">${icon("printer", 16)} ${t("Распечатать талон", "Талонды басып шығару")}</button>
-        </div>
-      </div>
-    </div>`;
-  document.body.appendChild(wrap);
-}
-
-// Серіктес клиникалардың кеңейтілген деректері (Шымкент)
-const CLINICS_EXTRA = {
-  1: {
-    district_ru: "Әл-Фараби р-н",
-    district_kk: "Әл-Фараби ауд.",
-    rating: "4.9 ★ (340+ B2B)",
-    capacity_ru: "До 70 чел. / день",
-    capacity_kk: "Күніне 70 адамға дейін",
-    mobile: true,
-    equip_ru: ["Цифровой рентген", "Аудиокамера", "Спирометрия", "Своя бак. лаборатория", "ЭКГ 12-кан."],
-    equip_kk: ["Цифрлық рентген", "Аудиокамера", "Спирометрия", "Өз бак. зертханасы", "12-арналы ЭКГ"],
-    slots: ["08:30", "10:00", "14:00"],
-  },
-  2: {
-    district_ru: "Еңбекші р-н",
-    district_kk: "Еңбекші ауд.",
-    rating: "4.8 ★ (215+ B2B)",
-    capacity_ru: "До 55 чел. / день",
-    capacity_kk: "Күніне 55 адамға дейін",
-    mobile: true,
-    equip_ru: ["Передвижной флюорограф", "Выездная бригада", "Нарко-тест панель", "Вестибулометрия"],
-    equip_kk: ["Жылжымалы флюорограф", "Көшпелі бригада", "Нарко-тест панель", "Вестибулометрия"],
-    slots: ["09:00", "11:30", "15:00"],
-  },
-  3: {
-    district_ru: "Тұран / Абай р-н",
-    district_kk: "Тұран / Абай ауд.",
-    rating: "4.9 ★ (190+ B2B)",
-    capacity_ru: "До 50 чел. / день",
-    capacity_kk: "Күніне 50 адамға дейін",
-    mobile: false,
-    equip_ru: ["Экспресс Санкнижка", "ПЦР / Бак. посев", "Дерматоскопия", "УЗИ / ЭКГ"],
-    equip_kk: ["Экспресс Санкітапша", "ПТР / Бак. егу", "Дерматоскопия", "УДЗ / ЭКГ"],
-    slots: ["08:00", "09:30", "13:30", "16:00"],
-  },
-};
-
-// Қараңғы / Жарық тақырып ауыстырғышы (Dark / Light Mode)
+// Shared theme controls.
 function getTheme() {
   try { return localStorage.getItem("medtekser_theme") || "light"; } catch (_) { return "light"; }
 }
@@ -1011,6 +592,14 @@ function toggleTheme() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  if (USE_LOCAL_API) {
+    const notice = document.createElement("div");
+    notice.className = "local-preview-notice";
+    notice.setAttribute("role", "note");
+    notice.dataset.ru = "Локальный предпросмотр: заявки хранятся только в этом браузере, вход не проверяет сервер. Не вводите реальные персональные или медицинские данные.";
+    notice.dataset.kk = "Жергілікті preview: өтінімдер тек осы браузерде сақталады, кіруді сервер тексермейді. Нақты жеке немесе медициналық деректерді енгізбеңіз.";
+    document.body.prepend(notice);
+  }
   document.querySelectorAll("[data-logo]").forEach((el) => (el.innerHTML = LOGO_HTML));
   document.querySelectorAll("[data-icon]").forEach((el) => {
     el.innerHTML = icon(el.dataset.icon, +el.dataset.size || 20) + el.innerHTML;

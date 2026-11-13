@@ -20,27 +20,31 @@
         <div data-lang-switch></div>
       </div>
       <h1 data-ru="Кабинет работодателя" data-kk="Жұмыс беруші кабинеті">Кабинет работодателя</h1>
-      <p class="sub" data-ru="Введите номер заявки и код доступа (демо: № 1, код DEMO12)" data-kk="Өтінім нөмірі мен кіру кодын енгізіңіз (демо: № 1, код DEMO12)">Введите номер заявки и код доступа (демо: № 1, код DEMO12)</p>
+      <p class="sub" data-ru="Введите номер заявки и код доступа, полученные после подтверждения запроса." data-kk="Сұрау расталғаннан кейін берілген өтінім нөмірі мен кіру кодын енгізіңіз.">Введите номер заявки и код доступа, полученные после подтверждения запроса.</p>
       <div class="field">
         <label for="l-id" data-ru="Номер заявки" data-kk="Өтінім нөмірі">Номер заявки</label>
         <input id="l-id" name="request_id" type="number" inputmode="numeric" data-ph-ru="Например: 1" data-ph-kk="Мысалы: 1" placeholder="Например: 1" required />
       </div>
       <div class="field">
         <label for="l-code" data-ru="Код доступа" data-kk="Кіру коды">Код доступа</label>
-        <input id="l-code" name="code" data-ph-ru="Например: DEMO12" data-ph-kk="Мысалы: DEMO12" placeholder="Например: DEMO12" autocomplete="off" style="text-transform:uppercase;letter-spacing:.1em" required />
+        <input id="l-code" name="code" data-ph-ru="Код из сообщения оператора" data-ph-kk="Оператор жіберген код" placeholder="Код из сообщения оператора" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" maxlength="16" style="text-transform:uppercase;letter-spacing:.1em" required />
       </div>
-      <div id="login-err"></div>
+      <div id="login-err" role="alert" aria-live="assertive" aria-atomic="true"></div>
       <button class="btn block" type="submit" id="login-btn" data-ru="Войти в кабинет" data-kk="Кабинетке кіру">Войти в кабинет</button>
-      <button class="btn ghost sm block" type="button" style="margin-top:10px" onclick="login(1, 'DEMO12')"
-              data-ru="⚡ Демо-вход в 1 клик (ТОО Ontustik Qurylys Group)"
-              data-kk="⚡ 1 кликпен демо-кіру (ЖШС Ontustik Qurylys Group)">
-        ⚡ Демо-вход в 1 клик (ТОО Ontustik Qurylys Group)
-      </button>
       <p class="muted small center" style="margin:18px 0 0">
         <span data-ru="Ещё нет заявки?" data-kk="Өтінім әлі жоқ па?">Ещё нет заявки?</span>
         <a href="./#order" data-ru="Оставить заявку" data-kk="Өтінім қалдыру">Оставить заявку</a>
       </p>
     </form>
+    <div class="auth-card hidden" id="api-unavailable">
+      <div class="auth-top"><a href="./" class="logo" data-logo></a><div data-lang-switch></div></div>
+      <h1 data-ru="Кабинет пока недоступен" data-kk="Кабинет әзірге қолжетімсіз">Кабинет пока недоступен</h1>
+      <p class="sub" data-ru="Серверный API или уведомление о конфиденциальности ещё не настроены. Свяжитесь с оператором по телефону или WhatsApp."
+         data-kk="Сервер API немесе құпиялық хабарламасы әлі бапталмаған. Операторға телефон немесе WhatsApp арқылы хабарласыңыз.">
+        Серверный API или уведомление о конфиденциальности ещё не настроены. Свяжитесь с оператором по телефону или WhatsApp.
+      </p>
+      <a class="btn block" href="./#order" data-ru="Вернуться на сайт" data-kk="Сайтқа оралу">Вернуться на сайт</a>
+    </div>
   </div>
 
   <!-- ============ КАБИНЕТ ============ -->
@@ -67,14 +71,6 @@
             <div id="c-status"></div>
           </div>
           <div class="flex no-print">
-            <button class="btn ghost sm" type="button" onclick="openOfficialDocModal('invoice', DATA)">
-              <span data-icon="file" data-size="16"></span>
-              <span data-ru="Счёт / КП" data-kk="Төлем шоты / КҰ">Счёт / КП</span>
-            </button>
-            <button class="btn ghost sm" type="button" onclick="openOfficialDocModal('act', DATA)">
-              <span data-icon="shield" data-size="16"></span>
-              <span data-ru="Заключительный акт (№ 131)" data-kk="Қорытынды акт (№ 131)">Заключительный акт (№ 131)</span>
-            </button>
             <button class="btn ghost sm" onclick="window.print()">
               <span data-icon="printer" data-size="16"></span>
               <span data-ru="Печать" data-kk="Басып шығару">Печать</span>
@@ -83,7 +79,7 @@
           </div>
         </div>
 
-        <div class="grid g-4" style="margin-bottom:24px" id="c-cards"></div>
+        <div class="grid g-3" style="margin-bottom:24px" id="c-cards"></div>
 
         <div class="panel" style="margin-bottom:24px">
           <div class="panel-head">
@@ -98,7 +94,8 @@
         <div class="panel no-print" style="margin-bottom:24px" id="upload-panel">
           <div class="panel-head">
             <h3 data-ru="Загрузка списка сотрудников" data-kk="Қызметкерлер тізімін жүктеу">Загрузка списка сотрудников</h3>
-            <span class="muted small" data-ru="Колонки: ФИО · ИИН · Должность · Вредный фактор" data-kk="Бағандар: ТАӘ · ЖСН · Лауазымы · Зиянды фактор">Колонки: ФИО · ИИН · Должность · Вредный фактор</span>
+            <span class="muted small" data-ru="Загружайте только необходимые сведения через защищённый кабинет и в соответствии с уведомлением о конфиденциальности." data-kk="Тек қажет мәліметтерді қорғалған кабинет арқылы және құпиялық хабарламасына сай жүктеңіз.">Загружайте только необходимые сведения через защищённый кабинет и в соответствии с уведомлением о конфиденциальности.</span>
+            <a id="privacy-notice" class="small hidden" target="_blank" rel="noopener" data-ru="Уведомление о конфиденциальности" data-kk="Құпиялық туралы хабарлама">Уведомление о конфиденциальности</a>
           </div>
           <div class="panel-body">
             <div class="grid g-2">
@@ -110,9 +107,9 @@
               </label>
               <div>
                 <textarea id="csv" rows="5"
-                  data-ph-ru="Или скопируйте строки прямо из таблицы Excel и вставьте сюда:&#10;Сейітов Нұрлан Асқарұлы	900101300123	Электросварщик	Шум, аэрозоли&#10;Әлиева Айгүл Серікқызы	950505400456	Бухгалтер"
-                  data-ph-kk="Немесе Excel кестесінен тікелей көшіріп қойыңыз:&#10;Сейітов Нұрлан Асқарұлы	900101300123	Дәнекерлеуші	Шу, аэрозоль&#10;Әлиева Айгүл Серікқызы	950505400456	Бухгалтер"
-                  placeholder="Или скопируйте строки прямо из таблицы Excel и вставьте сюда:&#10;Сейітов Нұрлан Асқарұлы	900101300123	Электросварщик	Шум, аэрозоли"></textarea>
+                  data-ph-ru="Вставьте строки CSV или таблицы с нужными столбцами. Не добавляйте данные, обработка которых не разрешена вашей организацией."
+                  data-ph-kk="Қажетті бағандары бар CSV немесе кесте жолдарын қойыңыз. Ұйымыңыз өңдеуге рұқсат бермеген деректерді қоспаңыз."
+                  placeholder="Вставьте строки CSV или таблицы с нужными столбцами. Не добавляйте данные, обработка которых не разрешена вашей организацией."></textarea>
               </div>
             </div>
             <div id="preview" class="muted small" style="margin:12px 0"></div>
@@ -121,9 +118,7 @@
                 <span data-icon="upload" data-size="18"></span>
                 <span data-ru="Добавить сотрудников в список" data-kk="Қызметкерлерді тізімге қосу">Добавить сотрудников в список</span>
               </button>
-              <button class="btn ghost sm" type="button" onclick="fillAiSampleCsv()">
-                ✨ <span data-ru="Заполнить пример + AI-подбор вредных факторов" data-kk="Үлгіні толтыру + AI зиянды факторларды анықтау">Заполнить пример + AI-подбор вредных факторов</span>
-              </button>
+
             </div>
           </div>
         </div>
@@ -163,6 +158,7 @@
     </main>
   </div>
 
+  <script src="./api-config.js"></script>
   <script src="./common.js"></script>
   <script>
     let token = localStorage.getItem("company_token");
@@ -177,7 +173,9 @@
         statuses.map((s) => `<option value="${s}" ${s === cur ? "selected" : ""}>${statusLabel(s)}</option>`).join("");
     }
 
-    api("/api/config").then((c) => { if (c.contact_phone) CONTACT = c.contact_phone; }).catch(() => {});
+    if (apiIsConfigured()) {
+      api("/api/config").then((c) => { if (c.contact_phone) CONTACT = c.contact_phone; }).catch(() => {});
+    }
 
     async function login(request_id, code) {
       const btn = $("login-btn");
@@ -239,8 +237,7 @@
           <div class="hint">${d.scheduled_date ? t("Дата подтверждена", "Расталған күн") : d.preferred_date ? t("Желаемая: ", "Қалаған: ") + fmtDate(d.preferred_date) : t("Ожидает согласования", "Келісілуде")}</div></div>
         <div class="stat"><span class="s-ic amber">${icon("users")}</span><div class="label">${t("Сотрудники", "Қызметкерлер")}</div>
           <div class="value">${d.employees_loaded}<span class="muted" style="font-size:16px;font-weight:600"> / ${d.employees_count}</span></div><div class="hint">${t("загружено в список", "тізімге жүктелді")}</div></div>
-        <div class="stat"><span class="s-ic coral">${icon("wallet")}</span><div class="label">${t("Итоговая сумма", "Жалпы құны")}</div>
-          <div class="value">${fmtMoney(d.price.total)}</div><div class="hint">${t("включая сервис ", "сервис қоса ")}${fmtMoney(d.price.service_fee)}</div></div>`;
+`;
 
       const p = d.progress, total = d.employees_loaded;
       const done = p.fit + p.unfit;
@@ -249,24 +246,13 @@
         ? `${progressBar(p, total)}${progressLegend(p)}`
         : `<div class="muted">${t("Загрузите список сотрудников ниже, чтобы отслеживать прохождение осмотра.", "Тексеру барысын көру үшін төменде қызметкерлер тізімін жүктеңіз.")}</div>`;
 
-      const savedHours = Math.round(Math.max(d.employees_count, total) * 2.5);
-      const protectedFine = Math.max(d.employees_count, total) * 85000;
       $("c-compliance-radar").innerHTML = `
-        <div class="stat">
-          <div class="label">🛡️ ${t("Защита от штрафов ст. 93 КоАП РК", "ҚР ӘҚБтК 93-бап айыппұлынан қорғау")}</div>
-          <div class="value" style="color:var(--ok);font-size:21px">${fmtMoney(protectedFine)}</div>
-          <div class="hint">${t("Полное соответствие Приказу МЗ РК № 131/2020 + ЭЦП НУЦ РК", "ҚР ДСМ № 131/2020 бұйрығына толық сәйкестік + ЭЦҚ")}</div>
-        </div>
-        <div class="stat">
-          <div class="label">⏱️ ${t("Экономия рабочего времени штата", "Штаттың жұмыс уақытын үнемдеу")}</div>
-          <div class="value" style="font-size:21px">~${savedHours} ${t("рабочих часов", "жұмыс сағаты")}</div>
-          <div class="hint">${t("Осмотр за 45 минут по талону Зелёного коридора без очередей", "Кезексіз Жасыл дәліз талонымен 45 минутта өту")}</div>
-        </div>
-        <div class="stat">
-          <div class="label">📅 ${t("Радар следующего медосмотра", "Келесі медтексеру радары")}</div>
-          <div class="value" style="font-size:21px">${t("Март 2027 (365 дн.)", "Наурыз 2027 (365 күн)")}</div>
-          <div class="hint">${t("Авто-напоминание HR в WhatsApp за 30 дней до истечения", "Мерзімі бітуге 30 күн қалғанда WhatsApp-қа авто-ескерту")}</div>
-        </div>`;
+        <div class="stat"><div class="label">${t("Следующие шаги", "Келесі қадамдар")}</div>
+          <div class="value" style="font-size:18px">${t("Согласовать условия", "Шарттарды келісу")}</div>
+          <div class="hint">${t("Клиника, объём услуг, график и стоимость подтверждаются отдельно.", "Клиника, қызмет көлемі, кесте мен құн бөлек расталады.")}</div></div>
+        <div class="stat"><div class="label">${t("Медицинские результаты", "Медициналық нәтижелер")}</div>
+          <div class="value" style="font-size:18px">${t("Подтверждает медорганизация", "Медициналық ұйым растайды")}</div>
+          <div class="hint">${t("Сайт не формирует медицинские заключения и не проверяет реестры.", "Сайт медициналық қорытынды жасамайды және тізілімдерді тексермейді.")}</div></div>`;
 
       $("upload-panel").classList.toggle("hidden", ["done", "cancelled"].includes(d.status));
       renderEmployees();
@@ -293,34 +279,10 @@
           <td>${badge(e.status)}</td>
           <td class="small">${esc(e.conclusion || "—")}</td>
           <td class="no-print">
-            <div class="flex" style="gap:6px;flex-wrap:nowrap">
-              <button class="btn ghost sm" style="padding:6px 10px;font-size:12px" onclick="openEmpTicket(${e.id})" title="${t("Маршрутный лист / Талон Зелёного коридора", "Маршруттық парақ / Жасыл дәліз талоны")}">🎫 ${t("Талон", "Талон")}</button>
-              <button class="btn ghost sm" style="padding:6px 10px;font-size:12px" onclick="openEmpPass(${e.id})">🪪 ${t("Паспорт QR", "Паспорт QR")}</button>
-              ${e.status === "pending" ? `<button class="icon-btn" title="${t("Удалить", "Өшіру")}" onclick="delEmp(${e.id})">${icon("x", 16)}</button>` : ""}
-            </div>
+            ${e.status === "pending" ? `<button class="icon-btn" title="${t("Удалить", "Өшіру")}" onclick="delEmp(${e.id})">${icon("x", 16)}</button>` : ""}
           </td>
         </tr>`).join("")
         : `<tr><td colspan="7" class="empty">${t("По вашему запросу ничего не найдено", "Ештеңе табылмады")}</td></tr>`;
-    }
-
-    function openEmpTicket(empId) {
-      const emp = DATA?.employees?.find((x) => x.id === empId);
-      if (emp) openRouteSheetModal(emp, DATA);
-    }
-
-    function openEmpPass(empId) {
-      const emp = DATA?.employees?.find((x) => x.id === empId);
-      if (emp) openMedPassportModal(emp, DATA);
-    }
-
-    function fillAiSampleCsv() {
-      $("csv").value = [
-        "Ахметов Серік Болатұлы\t910214300112\tГазоэлектросварщик\tСварочные аэрозоли, шум (п. 1.14 Приказа № 131)",
-        "Нұрғалиева Әлия Қайратқызы\t940822400334\tПовар горячего цеха\tДекретированная группа, высокая температура",
-        "Төлегенов Арман Ерікұлы\t891105300778\tВодитель самосвала\tУправление транспортом, общая вибрация (п. 10)",
-      ].join("\n");
-      updatePreview();
-      toast(t("AI подобрал вредные факторы по должностям", "AI лауазымдар бойынша зиянды факторларды анықтады"));
     }
 
     window.onLangChange = () => {
@@ -385,10 +347,32 @@
     });
 
     populateFilter();
-    const qs = new URLSearchParams(location.search);
-    if (qs.get("id")) $("l-id").value = qs.get("id");
-    if (qs.get("id") && qs.get("code")) login(qs.get("id"), qs.get("code"));
-    else if (token) load();
+    async function initializeCabinet() {
+      if (!apiIsConfigured()) return showUnavailable();
+      try {
+        const cfg = await api("/api/config");
+        setPrivacyNoticeUrl(cfg.privacy_notice_url);
+        if (cfg.contact_phone) CONTACT = cfg.contact_phone;
+        if (!intakeIsConfigured()) return showUnavailable();
+        if (privacyNoticeIsConfigured()) {
+          $("privacy-notice").href = PRIVACY_NOTICE_URL;
+          $("privacy-notice").classList.remove("hidden");
+        }
+        const qs = new URLSearchParams(location.search);
+        if (qs.get("id")) $("l-id").value = qs.get("id");
+        if (qs.get("id") && qs.get("code")) login(qs.get("id"), qs.get("code"));
+        else if (token) load();
+      } catch (_) {
+        showUnavailable();
+      }
+    }
+
+    function showUnavailable() {
+      $("login").classList.add("hidden");
+      $("api-unavailable").classList.remove("hidden");
+    }
+
+    initializeCabinet();
   </script>
 </body>
 </html>
