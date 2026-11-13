@@ -5,7 +5,8 @@ COPY server.py /app/
 COPY static /app/static
 
 RUN mkdir -p /data
-ENV PORT=8000 \
+ENV APP_ENV=production \
+    PORT=8000 \
     DB_PATH=/data/medtekser.db \
     PYTHONUNBUFFERED=1
 

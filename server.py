@@ -4,14 +4,14 @@
 Тек Python стандартты кітапханасы қолданылады: қосымша орнату қажет емес.
 Іске қосу:  python3 server.py   →  http://localhost:8000
 
-Орта айнымалылары (міндетті емес):
-  ADMIN_PASSWORD      — админ құпиясөзі (әдепкі: admin123, продакшнда міндетті түрде өзгертіңіз)
-  PORT                — порт (әдепкі: 8000)
-  DB_PATH             — SQLite файлының жолы
-  CONTACT_PHONE       — сайттағы байланыс телефоны, мысалы +77001234567
-  TELEGRAM_BOT_TOKEN  — жаңа өтінім туралы хабарлама жіберетін бот токені
-  TELEGRAM_CHAT_ID    — хабарлама баратын чат ID
-  PUBLIC_URL          — сайттың сыртқы мекенжайы (хабарламадағы сілтемелер үшін)
+Орта айнымалылары:
+  APP_ENV             — development немесе production
+  ADMIN_PASSWORD      — серверлік админ кіру құпиясөзі; production режимінде кемінде 16 таңба
+  ALLOWED_ORIGINS     — рұқсат етілген сайт Origin-дері
+  PRIVACY_NOTICE_URL  — HTTPS құпиялық хабарламасының мекенжайы
+  PORT, DB_PATH       — сервер порты және SQLite файлының жолы
+  CONTACT_PHONE       — сайттағы байланыс телефоны
+  PUBLIC_URL          — сайттың сыртқы мекенжайы
 """
 import csv
 import io
@@ -20,6 +20,7 @@ import os
 import secrets
 import sqlite3
 import threading
+import time
 import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta
@@ -29,58 +30,115 @@ from urllib.parse import urlparse
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 DB_PATH = os.environ.get("DB_PATH", os.path.join(BASE_DIR, "medtekser.db"))
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "").strip()
+APP_ENV = os.environ.get("APP_ENV", "development").strip().lower()
+PRIVACY_NOTICE_URL = os.environ.get("PRIVACY_NOTICE_URL", "").strip()
+DEFAULT_ALLOWED_ORIGINS = "https://dansho09.github.io"
+if APP_ENV == "development":
+    DEFAULT_ALLOWED_ORIGINS += ",http://localhost:8000,http://127.0.0.1:8000"
+ALLOWED_ORIGINS = {
+    origin.strip().rstrip("/")
+    for origin in os.environ.get("ALLOWED_ORIGINS", DEFAULT_ALLOWED_ORIGINS).split(",")
+    if origin.strip()
+}
+REQUEST_RATE_LIMIT = max(1, int(os.environ.get("REQUEST_RATE_LIMIT", "5")))
+REQUEST_RATE_WINDOW_SECONDS = max(1, int(os.environ.get("REQUEST_RATE_WINDOW_SECONDS", "600")))
 PORT = int(os.environ.get("PORT", "8000"))
 CONTACT_PHONE = os.environ.get("CONTACT_PHONE", "+77787961219")
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
-PUBLIC_URL = os.environ.get("PUBLIC_URL", "http://localhost:%d" % PORT).rstrip("/")
-SESSION_DAYS = 14
+PUBLIC_URL = os.environ.get("PUBLIC_URL", "https://dansho09.github.io/medtekser").rstrip("/")
+SESSION_LIFETIMES = {
+    "admin": timedelta(hours=12),
+    "company": timedelta(days=14),
+}
 
-# Бір қызметкерге арналған баға (теңге) — RU + KK
+# Қызмет атаулары ғана жария API-ға беріледі. Құрамы мен бағасы жеке келісіледі.
 EXAM_TYPES = {
     "periodic": {
         "name": "Периодический медосмотр",
         "name_ru": "Периодический медосмотр",
         "name_kk": "Мерзімді медициналық тексеру",
-        "price": 15000,
-        "desc": "Обязательный ежегодный осмотр сотрудников с вредными производственными факторами (Приказ МЗ РК № ҚР ДСМ-131/2020)",
-        "desc_ru": "Обязательный ежегодный осмотр сотрудников с вредными производственными факторами (Приказ МЗ РК № ҚР ДСМ-131/2020)",
-        "desc_kk": "Зиянды өндірістік факторы бар қызметкерлерге жылына бір рет міндетті тексеру (ҚР ДСМ № 131/2020 бұйрығы)",
     },
     "preliminary": {
-        "name": "Предварительный медосмотр (форма 075/у)",
-        "name_ru": "Предварительный медосмотр (форма 075/у)",
-        "name_kk": "Жұмысқа кірер алдындағы тексеру (075/е нысаны)",
-        "price": 12000,
-        "desc": "Медицинское освидетельствование кандидатов при приёме на работу с выдачей официального заключения",
-        "desc_ru": "Медицинское освидетельствование кандидатов при приёме на работу с выдачей официального заключения",
-        "desc_kk": "Жаңа қызметкерлерді жұмысқа қабылдар алдында ресми қорытынды бере отырып тексеру",
+        "name": "Предварительный медосмотр",
+        "name_ru": "Предварительный медосмотр",
+        "name_kk": "Алдын ала медициналық тексеру",
     },
     "pre_shift": {
         "name": "Предсменный / предрейсовый осмотр",
         "name_ru": "Предсменный / предрейсовый осмотр",
         "name_kk": "Ауысым / рейс алдындағы тексеру",
-        "price": 3000,
-        "desc": "Ежедневный допуск водителей и операторов спецтехники к смене (абонемент на месяц за 1 сотрудника)",
-        "desc_ru": "Ежедневный допуск водителей и операторов спецтехники к смене (абонемент на месяц за 1 сотрудника)",
-        "desc_kk": "Жүргізушілер мен арнайы техника операторларын күнделікті ауысымға жіберу (айына 1 адамға абонемент)",
     },
     "checkup": {
         "name": "Корпоративный Check-Up",
         "name_ru": "Корпоративный Check-Up",
         "name_kk": "Корпоративтік Check-Up",
-        "price": 35000,
-        "desc": "Расширенная диагностика здоровья команды: анализы крови, УЗИ, ЭКГ, терапевт и узкие специалисты",
-        "desc_ru": "Расширенная диагностика здоровья команды: анализы крови, УЗИ, ЭКГ, терапевт и узкие специалисты",
-        "desc_kk": "Команда денсаулығын кеңейтілген тексеру: қан талдаулары, УДЗ, ЭКГ, терапевт және бейінді мамандар",
     },
 }
-HARMFUL_FACTOR_SURCHARGE = 5000  # зиянды факторы бар қызметкерге үстеме
-SERVICE_FEE_PERCENT = 10          # сервис комиссиясы
 
 REQUEST_STATUSES = ["new", "confirmed", "scheduled", "in_progress", "done", "cancelled"]
 EMPLOYEE_STATUSES = ["pending", "scheduled", "fit", "unfit", "absent"]
+
+_REQUEST_HITS = {}
+_REQUEST_HITS_LOCK = threading.Lock()
+_AUTH_HITS = {}
+_AUTH_HITS_LOCK = threading.Lock()
+AUTH_RATE_LIMIT = 10
+AUTH_RATE_WINDOW_SECONDS = 900
+
+
+def valid_privacy_notice_url():
+    parsed = urlparse(PRIVACY_NOTICE_URL)
+    return parsed.scheme == "https" and bool(parsed.netloc)
+
+
+def validate_environment():
+    if APP_ENV not in ("development", "production"):
+        raise RuntimeError("APP_ENV must be development or production.")
+    if APP_ENV == "production":
+        configured_password = os.environ.get("ADMIN_PASSWORD", "").strip()
+        if len(configured_password) < 16 or configured_password == "admin123":
+            raise RuntimeError("Production requires an ADMIN_PASSWORD of at least 16 characters.")
+        if not ALLOWED_ORIGINS or "*" in ALLOWED_ORIGINS:
+            raise RuntimeError("Production requires explicit ALLOWED_ORIGINS; wildcards are not allowed.")
+        if any(urlparse(origin).scheme != "https" or not urlparse(origin).netloc for origin in ALLOWED_ORIGINS):
+            raise RuntimeError("Production ALLOWED_ORIGINS must contain HTTPS origins only.")
+        if not valid_privacy_notice_url():
+            raise RuntimeError("Production requires a public HTTPS PRIVACY_NOTICE_URL.")
+
+
+def consume_ip_quota(bucket, lock, source_ip, limit, window_seconds):
+    now = time.monotonic()
+    cutoff = now - window_seconds
+    with lock:
+        hits = bucket.setdefault(source_ip, [])
+        while hits and hits[0] <= cutoff:
+            hits.pop(0)
+        if len(hits) >= limit:
+            return max(1, int(hits[0] + window_seconds - now + 0.999))
+        hits.append(now)
+        if len(bucket) > 5000:
+            for ip, ip_hits in list(bucket.items()):
+                if not ip_hits or ip_hits[-1] <= cutoff:
+                    bucket.pop(ip, None)
+            while len(bucket) > 5000:
+                bucket.pop(next(iter(bucket)))
+        return 0
+
+
+def consume_request_quota(source_ip):
+    return consume_ip_quota(
+        _REQUEST_HITS, _REQUEST_HITS_LOCK, source_ip,
+        REQUEST_RATE_LIMIT, REQUEST_RATE_WINDOW_SECONDS,
+    )
+
+
+def consume_auth_quota(source_ip, endpoint):
+    return consume_ip_quota(
+        _AUTH_HITS, _AUTH_HITS_LOCK, endpoint + ":" + source_ip,
+        AUTH_RATE_LIMIT, AUTH_RATE_WINDOW_SECONDS,
+    )
 
 
 # ---------------------------------------------------------------- Дерекқор
@@ -140,51 +198,12 @@ def init_db():
             );
             """
         )
-        if conn.execute("SELECT COUNT(*) FROM clinics").fetchone()[0] == 0:
-            conn.executemany(
-                "INSERT INTO clinics (name, address, phone, license) VALUES (?,?,?,?)",
-                [
-                    ("«Шипагер» медициналық орталығы", "Шымкент, Тәуке хан даңғ. 45", "+7 7252 55 10 20", "№ 0184920DF"),
-                    ("«SapaMed» клиникасы", "Шымкент, Байтұрсынов к. 18", "+7 7252 44 20 30", "№ 0219401DF"),
-                    ("MedTekser көшпелі медбригадасы", "Кәсіпорын аумағына шығу", "+7 700 000 00 03", "№ 0184920DF-M"),
-                ],
-            )
-        if conn.execute("SELECT COUNT(*) FROM requests").fetchone()[0] == 0:
-            now_str = datetime.now().isoformat(timespec="seconds")
-            conn.execute(
-                """INSERT INTO requests (company, bin, contact_name, phone, email, employees_count,
-                   exam_type, preferred_date, comment, status, clinic_id, scheduled_date, access_code, created_at)
-                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-                ("ЖШС «Ontustik Qurylys Group»", "190440012345", "Ерлан Сапарұлы", "+7 701 555 44 33",
-                 "hr@oqg.kz", 6, "periodic", "2026-11-20", "Көшпелі бригада таңертең сағат 09:00-де келсе жақсы болар еді",
-                 "in_progress", 3, "2026-11-20", "DEMO12", now_str),
-            )
-            conn.executemany(
-                """INSERT INTO employees (request_id, full_name, iin, position, harmful_factor, status, conclusion)
-                   VALUES (1,?,?,?,?,?,?)""",
-                [
-                    ("Сейітов Нұрлан Асқарұлы", "900101300123", "Электрдәнекерлеуші", "Дәнекерлеу аэрозолі, шу", "fit", "Жұмысқа жарамды, шектеу жоқ"),
-                    ("Әлиева Айгүл Серікқызы", "950505400456", "Мұнара кранының машинисі", "Биіктіктегі жұмыс", "fit", "Жұмысқа жарамды"),
-                    ("Мұратов Дәурен Бақытұлы", "880312300789", "Жүк көлігінің жүргізушісі", "Діріл, шу", "fit", "Жұмысқа жарамды"),
-                    ("Қасымов Бекзат Талғатұлы", "921120300551", "Монтажшы", "Биіктіктегі жұмыс, шу", "scheduled", ""),
-                    ("Жұмабаева Гүлнар Маратқызы", "870714400219", "Қойма меңгерушісі", "", "scheduled", ""),
-                    ("Оспанов Мақсат Қайратұлы", "980909300882", "Бетоншы", "Цемент шаңы, діріл", "pending", ""),
-                ],
-            )
-            conn.execute(
-                """INSERT INTO requests (company, bin, contact_name, phone, email, employees_count,
-                   exam_type, preferred_date, comment, status, clinic_id, scheduled_date, access_code, created_at)
-                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-                ("ЖШС «Shymkent Logistics»", "210840098765", "Динара Кенжебекқызы", "+7 702 777 88 99",
-                 "office@shymlog.kz", 25, "pre_shift", "2026-11-22", "25 жүргізушіге ай сайынғы ауысым алдындағы тексеру",
-                 "confirmed", 1, "2026-11-22", "LOG777", now_str),
-            )
         conn.execute("DELETE FROM sessions WHERE expires_at < ?", (datetime.now().isoformat(),))
 
 
 def create_session(role, request_id=None):
     token = secrets.token_urlsafe(32)
-    expires = (datetime.now() + timedelta(days=SESSION_DAYS)).isoformat(timespec="seconds")
+    expires = (datetime.now() + SESSION_LIFETIMES.get(role, timedelta(hours=1))).isoformat(timespec="seconds")
     with db() as conn:
         conn.execute("INSERT INTO sessions (token, role, request_id, expires_at) VALUES (?,?,?,?)",
                      (token, role, request_id, expires))
@@ -205,11 +224,6 @@ def delete_session(token):
         conn.execute("DELETE FROM sessions WHERE token=?", (token,))
 
 
-def calc_price(exam_type, employees_count, harmful_count=0):
-    base = EXAM_TYPES.get(exam_type, EXAM_TYPES["periodic"])["price"]
-    subtotal = base * employees_count + HARMFUL_FACTOR_SURCHARGE * harmful_count
-    fee = round(subtotal * SERVICE_FEE_PERCENT / 100)
-    return {"per_employee": base, "subtotal": subtotal, "service_fee": fee, "total": subtotal + fee}
 
 
 def request_to_dict(conn, row, include_employees=False):
@@ -219,9 +233,6 @@ def request_to_dict(conn, row, include_employees=False):
     d["exam_name_ru"] = et.get("name_ru", d["exam_name"])
     d["exam_name_kk"] = et.get("name_kk", d["exam_name"])
     emps = conn.execute("SELECT * FROM employees WHERE request_id=? ORDER BY id", (d["id"],)).fetchall()
-    harmful = sum(1 for e in emps if (e["harmful_factor"] or "").strip())
-    count = max(d["employees_count"], len(emps))
-    d["price"] = calc_price(d["exam_type"], count, harmful)
     d["progress"] = {s: sum(1 for e in emps if e["status"] == s) for s in EMPLOYEE_STATUSES}
     d["employees_loaded"] = len(emps)
     if d.get("clinic_id"):
@@ -255,6 +266,13 @@ def html_escape(s):
     return str(s or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
+def safe_csv_cell(value):
+    text = "" if value is None else str(value)
+    if text.lstrip().startswith(("=", "+", "-", "@")):
+        return "'" + text
+    return text
+
+
 # ---------------------------------------------------------------- HTTP
 class Handler(SimpleHTTPRequestHandler):
     extensions_map = {**SimpleHTTPRequestHandler.extensions_map,
@@ -271,18 +289,33 @@ class Handler(SimpleHTTPRequestHandler):
 
     def end_headers(self):
         self.send_header("X-Content-Type-Options", "nosniff")
-        self.send_header("Referrer-Policy", "same-origin")
+        self.send_header("X-Frame-Options", "DENY")
+        self.send_header("Content-Security-Policy", "frame-ancestors 'none'")
+        self.send_header("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+        self.send_header("Referrer-Policy", "no-referrer")
+        if APP_ENV == "production":
+            self.send_header("Strict-Transport-Security", "max-age=31536000")
+        path = urlparse(self.path).path
+        origin = self.headers.get("Origin", "").rstrip("/")
+        if path.startswith("/api/") and origin and origin in ALLOWED_ORIGINS:
+            self.send_header("Access-Control-Allow-Origin", origin)
+            self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+            self.send_header("Access-Control-Allow-Headers", "Authorization, Content-Type")
+            self.send_header("Access-Control-Max-Age", "600")
+            self.send_header("Vary", "Origin")
         if not urlparse(self.path).path.startswith("/api/"):
             self.send_header("Cache-Control", "no-cache")
         super().end_headers()
 
     # --- көмекші әдістер
-    def send_json(self, data, status=200):
+    def send_json(self, data, status=200, extra_headers=None):
         body = json.dumps(data, ensure_ascii=False).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
+        for name, value in (extra_headers or {}).items():
+            self.send_header(name, str(value))
         self.end_headers()
         self.wfile.write(body)
 
@@ -334,6 +367,18 @@ class Handler(SimpleHTTPRequestHandler):
     def do_DELETE(self):
         self.dispatch(self.route_delete)
 
+    def do_OPTIONS(self):
+        path = urlparse(self.path).path
+        origin = self.headers.get("Origin", "").rstrip("/")
+        if not path.startswith("/api/"):
+            return self.error("Табылмады", 404)
+        if not origin or origin not in ALLOWED_ORIGINS:
+            return self.error("Origin рұқсат етілмеген", 403)
+        self.send_response(204)
+        self.send_header("Content-Length", "0")
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+
     def dispatch(self, fn):
         path = urlparse(self.path).path
         try:
@@ -348,9 +393,8 @@ class Handler(SimpleHTTPRequestHandler):
         if path == "/api/config":
             return self.send_json({
                 "exam_types": EXAM_TYPES,
-                "harmful_surcharge": HARMFUL_FACTOR_SURCHARGE,
-                "service_fee_percent": SERVICE_FEE_PERCENT,
                 "contact_phone": CONTACT_PHONE,
+                "privacy_notice_url": PRIVACY_NOTICE_URL,
             })
         if path == "/api/cabinet":
             rid = self.company_request_id()
@@ -386,14 +430,11 @@ class Handler(SimpleHTTPRequestHandler):
             if path == "/api/admin/stats":
                 items = [request_to_dict(conn, r) for r in conn.execute("SELECT * FROM requests").fetchall()]
                 active = [i for i in items if i["status"] != "cancelled"]
-                paid = [i for i in active if i["status"] != "new"]
                 return self.send_json({
                     "requests": len(items),
                     "new": sum(1 for i in items if i["status"] == "new"),
                     "employees": sum(max(i["employees_count"], i["employees_loaded"]) for i in active),
                     "examined": sum(i["progress"]["fit"] + i["progress"]["unfit"] for i in active),
-                    "revenue": sum(i["price"]["total"] for i in paid),
-                    "service_fee": sum(i["price"]["service_fee"] for i in paid),
                 })
         self.error("Табылмады", 404)
 
@@ -407,8 +448,10 @@ class Handler(SimpleHTTPRequestHandler):
         labels = {"pending": "Күтуде", "scheduled": "Жоспарланды", "fit": "Жарамды",
                   "unfit": "Жарамсыз", "absent": "Келмеді"}
         for i, e in enumerate(conn.execute("SELECT * FROM employees WHERE request_id=? ORDER BY id", (rid,)), 1):
-            w.writerow([i, e["full_name"], e["iin"], e["position"], e["harmful_factor"],
-                        labels.get(e["status"], e["status"]), e["conclusion"] or ""])
+            w.writerow([i, *(safe_csv_cell(value) for value in (
+                e["full_name"], e["iin"], e["position"], e["harmful_factor"],
+                labels.get(e["status"], e["status"]), e["conclusion"] or "",
+            ))])
         body = ("﻿" + buf.getvalue()).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "text/csv; charset=utf-8")
@@ -419,9 +462,21 @@ class Handler(SimpleHTTPRequestHandler):
 
     def route_post(self, path):
         if path == "/api/requests":
+            origin = self.headers.get("Origin", "").rstrip("/")
+            if origin and origin not in ALLOWED_ORIGINS:
+                return self.error("Origin рұқсат етілмеген", 403)
+            if not valid_privacy_notice_url():
+                return self.error("Өтінім қабылдау үшін HTTPS құпиялық хабарламасын баптау қажет", 503)
             d = self.read_json()
             if d.get("website"):
                 return self.send_json({"id": 0, "access_code": ""}, 201)
+            retry_after = consume_request_quota(self.client_address[0])
+            if retry_after:
+                return self.send_json(
+                    {"error": "Өтінім тым жиі жіберілді. Кейінірек қайталап көріңіз."},
+                    429,
+                    {"Retry-After": retry_after},
+                )
             for f, label in (("company", "Компания атауы"), ("contact_name", "Байланыс тұлға"),
                              ("phone", "Телефон"), ("employees_count", "Қызметкерлер саны"),
                              ("exam_type", "Тексеру түрі")):
@@ -435,7 +490,7 @@ class Handler(SimpleHTTPRequestHandler):
             bin_ = str(d.get("bin", "")).strip()
             if bin_ and (not bin_.isdigit() or len(bin_) != 12):
                 raise ValueError("БСН 12 саннан тұруы керек")
-            code = secrets.token_hex(3).upper()
+            code = secrets.token_hex(8).upper()
             with db() as conn:
                 cur = conn.execute(
                     """INSERT INTO requests (company, bin, contact_name, phone, email, employees_count,
@@ -447,16 +502,21 @@ class Handler(SimpleHTTPRequestHandler):
                      datetime.now().isoformat(timespec="seconds")),
                 )
                 rid = cur.lastrowid
-            price = calc_price(d["exam_type"], count)
             notify_telegram(
-                "🆕 <b>Жаңа өтінім №%d</b>\n🏢 %s\n👤 %s, %s\n🩺 %s · %d адам\n💰 %s ₸\n%s/admin" % (
+                "🆕 <b>Жаңа өтінім №%d</b>\n🏢 %s\n👤 %s, %s\n🩺 %s · %d адам\n%s/admin" % (
                     rid, html_escape(d["company"]), html_escape(d["contact_name"]), html_escape(d["phone"]),
-                    EXAM_TYPES[d["exam_type"]]["name"], count, "{:,}".format(price["total"]).replace(",", " "),
-                    PUBLIC_URL))
-            return self.send_json({"id": rid, "access_code": code, "price": price}, 201)
+                    EXAM_TYPES[d["exam_type"]]["name"], count, PUBLIC_URL))
+            return self.send_json({"id": rid, "access_code": code}, 201)
 
         if path == "/api/cabinet/login":
             d = self.read_json()
+            retry_after = consume_auth_quota(self.client_address[0], "company")
+            if retry_after:
+                return self.send_json(
+                    {"error": "Кіру әрекеті тым көп. 15 минуттан кейін қайталап көріңіз."},
+                    429,
+                    {"Retry-After": retry_after},
+                )
             try:
                 rid = int(d.get("request_id") or 0)
             except (TypeError, ValueError):
@@ -473,6 +533,8 @@ class Handler(SimpleHTTPRequestHandler):
             return self.send_json({"ok": True})
 
         if path == "/api/cabinet/employees":
+            if not valid_privacy_notice_url():
+                return self.error("Қызметкерлер тізімін жүктеу үшін HTTPS құпиялық хабарламасын баптау қажет", 503)
             rid = self.company_request_id()
             if rid is None:
                 return
@@ -496,6 +558,15 @@ class Handler(SimpleHTTPRequestHandler):
 
         if path == "/api/admin/login":
             d = self.read_json()
+            if not ADMIN_PASSWORD:
+                return self.error("Серверде әкімші құпиясөзі орнатылмаған", 503)
+            retry_after = consume_auth_quota(self.client_address[0], "admin")
+            if retry_after:
+                return self.send_json(
+                    {"error": "Кіру әрекеті тым көп. 15 минуттан кейін қайталап көріңіз."},
+                    429,
+                    {"Retry-After": retry_after},
+                )
             if not secrets.compare_digest(str(d.get("password", "")).encode(), ADMIN_PASSWORD.encode()):
                 return self.error("Құпиясөз қате", 401)
             return self.send_json({"token": create_session("admin")})
@@ -595,12 +666,12 @@ def parse_employees_csv(text):
 
 
 if __name__ == "__main__":
+    validate_environment()
     init_db()
-    server = ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
+    bind_host = "127.0.0.1" if APP_ENV == "development" else "0.0.0.0"
+    server = ThreadingHTTPServer((bind_host, PORT), Handler)
     print("MedTekser іске қосылды: http://localhost:%d" % PORT)
     print("Админ панель: http://localhost:%d/admin" % PORT)
-    if ADMIN_PASSWORD == "admin123":
-        print("⚠️  ЕСКЕРТУ: әдепкі админ құпиясөзі қолданылып тұр. ADMIN_PASSWORD орнатыңыз!")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
